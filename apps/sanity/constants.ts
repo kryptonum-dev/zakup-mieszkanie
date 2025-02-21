@@ -3,7 +3,7 @@
  * This constant is used for constructing full URLs and determining external links.
  * @constant
  */
-export const DOMAIN: string = 'http://localhost:4321'
+export const DOMAIN: string = 'https://zakup-mieszkanie-astro-git-dev-kryptonum.vercel.app/'
 
 /**
  * Domain used for preview functionality in development environment.
