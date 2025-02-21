@@ -1,6 +1,9 @@
 ---
 import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
 import { ImageDataQuery, type ImageDataProps } from '../ui/image'
+import sanityFetch from '@/src/utils/sanity.fetch'
+
+const { slug } = Astro.params
 
 export const ContactImage_Query = `
   _type == "ContactImage" => {
@@ -8,14 +11,6 @@ export const ContactImage_Query = `
     ${PortableTextQuery('heading')}
     ${PortableTextQuery('paragraph')}
     ${ImageDataQuery('image')}
-    "contact": *[_type == "page" && slug.current == $slug][0].localSettings {
-      email,
-      phone,
-    },
-    "globalContact": *[_type == "settings"][0] {
-      email,
-      phone,
-    },
   },
 `
 
@@ -26,19 +21,39 @@ type Props = {
   heading: PortableTextValue
   paragraph: PortableTextValue
   image: ImageDataProps
-  contact?: {
-    email?: string
-    phone?: string
-  }
-  globalContact?: {
+}
+
+const { index, sectionId, label, heading, paragraph, image } = Astro.props
+
+const contact = await sanityFetch<{
+  localSettings: {
     email: string
     phone: string
   }
-}
+  globalSettings: {
+    email: string
+    phone: string
+  }
+}>({
+  query: `
+    *[_type == "page" && slug.current == $slug][0] {
+      localSettings {
+        email,
+        phone,
+      },
+      "globalSettings": *[_type == "global"][0] {
+        email,
+        phone,
+      },
+    }
+  `,
+  params: { slug: `/${slug || ''}` },
+})
 
-const { index, sectionId, label, heading, paragraph, image, contact, globalContact } = Astro.props
-const email = contact?.email || globalContact?.email
-const phone = contact?.phone || globalContact?.phone
+const { localSettings, globalSettings } = contact
+
+const email = localSettings?.email || globalSettings?.email
+const phone = localSettings?.phone || globalSettings?.phone
 ---
 
 <section class="ContactImage" id={sectionId}></section>

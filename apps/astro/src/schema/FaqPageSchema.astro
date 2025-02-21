@@ -4,9 +4,7 @@ import { DOMAIN } from '@/global/constants'
 import sanityFetch from '@/utils/sanity.fetch'
 import { toHTML } from '@/utils/to-html'
 
-const { slug } = Astro.params
-
-if (!slug) return null
+const { slug } = Astro.props
 
 const page = await sanityFetch<{
   components: {
@@ -21,14 +19,14 @@ const page = await sanityFetch<{
     *[slug.current == $slug][0] {
       components[] {
         _type,
-        faqItems[]-> {
+        faqItems[] {
           question,
           answer
         }
       }
     }
   `,
-  params: { slug },
+  params: { slug: `/${slug || ''}` },
 })
 
 if (!page?.components) return null
