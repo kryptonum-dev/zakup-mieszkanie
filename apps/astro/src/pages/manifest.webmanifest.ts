@@ -1,6 +1,6 @@
 export const prerender = true
 
-import icon from '@repo/shared/assets/icon.png'
+import icon from '@/assets/icon.png'
 import { BACKGROUND_COLOR, DEFAULT_DESCRIPTION, DEFAULT_TITLE, THEME_COLOR } from '@/global/constants'
 import type { APIRoute } from 'astro'
 import { getImage } from 'astro:assets'
@@ -39,7 +39,6 @@ export const GET: APIRoute = async () => {
   })
 
   return new Response(manifest, {
-    status: 200,
     headers: { 'Content-Type': 'application/manifest+json' },
   })
 }
