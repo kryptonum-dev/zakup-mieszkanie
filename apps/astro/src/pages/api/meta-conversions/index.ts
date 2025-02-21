@@ -3,6 +3,7 @@ import { getPageAnalyticsData } from '@/utils/page-data'
 import type { APIRoute } from 'astro'
 
 type UserData = {
+  name?: string
   email?: string
   eventName: string
   eventSource: string
@@ -18,6 +19,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const userData = (await request.json()) as UserData
     const {
+      name,
       email,
       eventName,
       eventSource,
@@ -114,6 +116,7 @@ export const POST: APIRoute = async ({ request }) => {
                       client_ip_address,
                       client_user_agent,
                       ...(email && { em: await hash(email) }),
+                      ...(name && { fn: name }),
                       ...(fbc && { fbc }),
                       ...(fbp && { fbp }),
                     }

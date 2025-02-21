@@ -7,9 +7,9 @@ import type { APIRoute } from 'astro'
 import type { Props } from './sendContactEmail'
 
 export const POST: APIRoute = async ({ request }) => {
-  const { email, message, legal, slug } = (await request.json()) as Props
+  const { name, email, message, legal, slug } = (await request.json()) as Props
 
-  if (!REGEX.email.test(email) || !message || !legal) {
+  if (!REGEX.email.test(email) || !message || !legal || !name) {
     return new Response(
       JSON.stringify({
         message: 'Missing required fields',
@@ -20,6 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const htmlTemplate = `
+    <p>Imię: <b>${name}</b></p>
     <p>Adres email: <b>${email}</b></p>
     <br />
     <p>${message.trim().replace(/\n/g, '<br />')}</p>
@@ -34,10 +35,10 @@ export const POST: APIRoute = async ({ request }) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Formularz kontaktowy WOODME <formularz@sending.wood-me.pl>',
-        to: 'projekty@wood-me.pl',
+        from: 'Formularz kontaktowy Zakup Mieszkanie <formularz@sending.zakupmieszkanie.pl>',
+        to: 'admin@zakupmieszkanie.pl',
         reply_to: email,
-        subject: `Wiadomość z formularza kontaktowego WOODME`,
+        subject: `Wiadomość z formularza kontaktowego Zakup Mieszkanie`,
         html: htmlTemplate,
         text: textTemplate,
       }),
@@ -55,10 +56,10 @@ export const POST: APIRoute = async ({ request }) => {
 
     const userConfirmationTemplate = `
       <p>Witaj ${email},</p>
-      <p>Dziękujemy za skontaktowanie się z WOODME. Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.</p>
+      <p>Dziękujemy za skontaktowanie się z Zakup Mieszkanie. Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.</p>
       <br />
       <p>Z poważaniem,</p>
-      <p>Zespół WOODME</p>
+      <p>Zespół Zakup Mieszkanie</p>
     `
     const userConfirmationText = htmlToString(userConfirmationTemplate)
 
@@ -69,9 +70,9 @@ export const POST: APIRoute = async ({ request }) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Formularz kontaktowy WOODME <formularz@sending.wood-me.pl>',
+        from: 'Formularz kontaktowy Zakup Mieszkanie <formularz@sending.zakupmieszkanie.pl>',
         to: email,
-        subject: `Dziękujemy za kontakt z WOODME`,
+        subject: `Dziękujemy za kontakt z Zakup Mieszkanie`,
         html: userConfirmationTemplate,
         text: userConfirmationText,
       }),
@@ -89,6 +90,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { event_id, event_time } = generateEventIdentifiers()
     const conversionData = {
+      name,
       email,
       eventName: 'Lead',
       eventSource: 'website',

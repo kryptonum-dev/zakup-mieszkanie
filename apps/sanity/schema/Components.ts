@@ -1,5 +1,6 @@
 import { defineType } from 'sanity'
 import Benefits from './components/Benefits'
+import ContactForm from './components/ContactForm'
 import ContactImage from './components/ContactImage'
 import Faq from './components/Faq'
 import Features from './components/Features'
@@ -13,7 +14,7 @@ export default defineType({
   title: 'Components',
   description:
     'Build your page by adding customizable components. Drag and drop to reorder, each component renders sequentially to create your landing page layout.',
-  of: [HeroSection, LocationFeatures, Features, Process, Benefits, ContactImage, Faq],
+  of: [HeroSection, LocationFeatures, Features, Process, Benefits, ContactImage, Faq, ContactForm],
   options: {
     insertMenu: {
       filter: true,
