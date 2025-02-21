@@ -35,7 +35,6 @@ export default defineType({
       },
       initialValue: 'primary',
       validation: (Rule) => Rule.required(),
-      fieldset: 'style',
     }),
     defineField({
       name: 'href',
@@ -51,25 +50,18 @@ export default defineType({
             !value.startsWith('https://') &&
             !value.startsWith('mailto:') &&
             !value.startsWith('tel:') &&
-            !value.startsWith('/')
+            !value.startsWith('/') &&
+            !value.startsWith('#')
           ) {
-            return 'Link must start with "https://", "mailto:", "tel:" or "/" for internal pages'
+            return 'Link must start with "https://", "mailto:", "tel:", "/" for internal pages, or "#" for section links'
           }
-          if (!value.startsWith('/') && !isValidUrl(value)) return 'Invalid URL'
+          if (!value.startsWith('/') && !value.startsWith('#') && !isValidUrl(value)) return 'Invalid URL'
           return true
         }),
       ],
     }),
   ],
-  fieldsets: [
-    {
-      name: 'style',
-      title: 'Style',
-      options: {
-        columns: 2,
-      },
-    },
-  ],
+
   preview: {
     select: {
       title: 'text',

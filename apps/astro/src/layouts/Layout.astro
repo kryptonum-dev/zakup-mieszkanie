@@ -5,6 +5,8 @@ import Head, { type Props as HeadProps } from './Head.astro'
 import OrganizationSchema from '@/schema/OrganizationSchema.astro'
 import FaqPageSchema from '@/schema/FaqPageSchema.astro'
 import CookieConsent from './CookieConsent.astro'
+import Header from './Header.astro'
+import Footer from './Footer.astro'
 
 const { ...props } = Astro.props as HeadProps & { slug?: string }
 ---
@@ -19,8 +21,10 @@ const { ...props } = Astro.props as HeadProps & { slug?: string }
   </head>
   <body>
     {props.slug && <CookieConsent slug={props.slug} />}
+    <Header />
     <main id="main">
       <slot />
     </main>
+    <Footer />
   </body>
 </html>

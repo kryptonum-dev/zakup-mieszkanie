@@ -1,0 +1,33 @@
+---
+import sanityFetch from '@/utils/sanity.fetch'
+
+type FooterProps = {
+  footerLinks: {
+    text: string
+    href: string
+  }[]
+}
+
+const { slug } = Astro.params
+
+const data = await sanityFetch<FooterProps>({
+  query: `
+    *[_type == "page" && slug.current == $slug][0].localSettings {
+      footerLinks[] {
+        text,
+        href
+      }
+    }
+  `,
+  params: { slug: `/${slug || ''}` },
+})
+
+console.log(data)
+---
+
+<footer class="Footer"></footer>
+
+<style lang="scss">
+  .Footer {
+  }
+</style>
