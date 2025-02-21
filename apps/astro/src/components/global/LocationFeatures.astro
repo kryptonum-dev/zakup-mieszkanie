@@ -1,0 +1,32 @@
+---
+import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
+import { ButtonDataQuery, type ButtonDataProps } from '../ui/button'
+
+export const LocationFeatures_Query = `
+  _type == "LocationFeatures" => {
+    label,
+    ${PortableTextQuery('heading')}
+    ${PortableTextQuery('paragraph')}
+    ${ButtonDataQuery('cta')}
+  },
+`
+
+type Props = {
+  index: number
+  sectionId?: string
+  label: string
+  heading: PortableTextValue
+  paragraph: PortableTextValue
+  cta: ButtonDataProps
+}
+
+const { index, sectionId, label, heading, paragraph, cta } = Astro.props
+console.log(index, sectionId, label, heading, paragraph, cta)
+---
+
+<section class="LocationFeatures" id={sectionId}></section>
+
+<style lang="scss">
+  .LocationFeatures {
+  }
+</style>

@@ -1,9 +1,15 @@
 ---
 import type { ComponentProps } from 'astro/types'
 import FullWidthPhoto, { FullWidthPhoto_Query } from '@/components/global/FullWidthPhoto.astro'
+import HeroSection, { HeroSection_Query } from '@/components/global/HeroSection.astro'
+import LocationFeatures, { LocationFeatures_Query } from '@/components/global/LocationFeatures.astro'
+import Benefits, { Benefits_Query } from '@/components/global/Benefits.astro'
 
 const components = {
   FullWidthPhoto,
+  HeroSection,
+  LocationFeatures,
+  Benefits,
 }
 
 type ComponentsMap = {
@@ -26,6 +32,9 @@ export const Components_Query = /* groq */ `
     _type,
     sectionId,
     ${FullWidthPhoto_Query}
+    ${HeroSection_Query}
+    ${LocationFeatures_Query}
+    ${Benefits_Query}
   }
 `
 ---
