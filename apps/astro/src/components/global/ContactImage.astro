@@ -1,0 +1,49 @@
+---
+import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
+import { ImageDataQuery, type ImageDataProps } from '../ui/image'
+
+export const ContactImage_Query = `
+  _type == "ContactImage" => {
+    label,
+    ${PortableTextQuery('heading')}
+    ${PortableTextQuery('paragraph')}
+    ${ImageDataQuery('image')}
+    "contact": *[_type == "page" && slug.current == $slug][0].localSettings {
+      email,
+      phone,
+    },
+    "globalContact": *[_type == "settings"][0] {
+      email,
+      phone,
+    },
+  },
+`
+
+type Props = {
+  index: number
+  sectionId?: string
+  label: string
+  heading: PortableTextValue
+  paragraph: PortableTextValue
+  image: ImageDataProps
+  contact?: {
+    email?: string
+    phone?: string
+  }
+  globalContact?: {
+    email: string
+    phone: string
+  }
+}
+
+const { index, sectionId, label, heading, paragraph, image, contact, globalContact } = Astro.props
+const email = contact?.email || globalContact?.email
+const phone = contact?.phone || globalContact?.phone
+---
+
+<section class="ContactImage" id={sectionId}></section>
+
+<style lang="scss">
+  .ContactImage {
+  }
+</style>

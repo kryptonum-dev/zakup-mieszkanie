@@ -3,32 +3,41 @@ import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
 import { ImageDataQuery, type ImageDataProps } from '../ui/image'
 import { ButtonDataQuery, type ButtonDataProps } from '../ui/button'
 
-export const Benefits_Query = `
-  _type == "Benefits" => {
-    ${ImageDataQuery('image')}
+type Step = {
+  icon: ImageDataProps
+  heading: string
+  paragraph: string
+}
+
+export const Process_Query = `
+  _type == "Process" => {
     label,
     ${PortableTextQuery('heading')}
-    ${PortableTextQuery('paragraph')}
     ${ButtonDataQuery('cta')}
+    steps[] {
+      ${ImageDataQuery('icon')}
+      ${PortableTextQuery('heading')}
+      ${PortableTextQuery('paragraph')}
+    }
   },
 `
 
 type Props = {
   index: number
   sectionId?: string
-  image: ImageDataProps
   label: string
   heading: PortableTextValue
-  paragraph: PortableTextValue
   cta: ButtonDataProps
+  steps: Step[]
 }
 
-const { index, sectionId, image, label, heading, paragraph, cta } = Astro.props
+const { index, sectionId, label, heading, cta, steps } = Astro.props
 ---
 
-<section class="Benefits" id={sectionId}></section>
+<section class="Process" id={sectionId}></section>
 
 <style lang="scss">
-  .Benefits {
+  .Process {
   }
 </style>
+

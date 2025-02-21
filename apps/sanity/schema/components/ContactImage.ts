@@ -2,9 +2,9 @@ import { defineField } from 'sanity'
 import { toPlainText } from '../../utils/to-plain-text'
 import sectionId from '../ui/sectionId'
 
-const name = 'Benefits'
-const title = 'Benefits'
-const icon = () => '🎯'
+const name = 'ContactImage'
+const title = 'Contact Image'
+const icon = () => '👤'
 
 export default defineField({
   name,
@@ -12,12 +12,6 @@ export default defineField({
   title,
   icon,
   fields: [
-    defineField({
-      name: 'image',
-      type: 'image',
-      title: 'Image',
-      validation: (Rule) => Rule.required(),
-    }),
     defineField({
       name: 'label',
       type: 'string',
@@ -37,9 +31,9 @@ export default defineField({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'cta',
-      type: 'cta',
-      title: 'Call To Action',
+      name: 'image',
+      type: 'image',
+      title: 'Image',
       validation: (Rule) => Rule.required(),
     }),
     ...sectionId,

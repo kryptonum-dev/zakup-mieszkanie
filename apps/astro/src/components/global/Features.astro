@@ -1,0 +1,40 @@
+---
+import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
+import { ImageDataQuery, type ImageDataProps } from '../ui/image'
+
+type Feature = {
+  icon: ImageDataProps
+  heading: PortableTextValue
+  paragraph: PortableTextValue
+}
+
+export const Features_Query = `
+  _type == "Features" => {
+    ${ImageDataQuery('image')}
+    ${PortableTextQuery('heading')}
+    features[] {
+      ${ImageDataQuery('icon')}
+      ${PortableTextQuery('heading')}
+      ${PortableTextQuery('paragraph')}
+    }
+  },
+`
+
+type Props = {
+  index: number
+  sectionId?: string
+  image: ImageDataProps
+  heading: PortableTextValue
+  features: Feature[]
+}
+
+const { index, sectionId, image, heading, features } = Astro.props
+---
+
+<section class="Features" id={sectionId}></section>
+
+<style lang="scss">
+  .Features {
+  }
+</style>
+

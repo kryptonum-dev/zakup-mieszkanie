@@ -1,7 +1,11 @@
 import { defineType } from 'sanity'
 import Benefits from './components/Benefits'
+import ContactImage from './components/ContactImage'
+import Faq from './components/Faq'
+import Features from './components/Features'
 import HeroSection from './components/HeroSection'
 import LocationFeatures from './components/LocationFeatures'
+import Process from './components/Process'
 
 export default defineType({
   name: 'components',
@@ -9,7 +13,7 @@ export default defineType({
   title: 'Components',
   description:
     'Build your page by adding customizable components. Drag and drop to reorder, each component renders sequentially to create your landing page layout.',
-  of: [HeroSection, LocationFeatures, Benefits],
+  of: [HeroSection, LocationFeatures, Features, Process, Benefits, ContactImage, Faq],
   options: {
     insertMenu: {
       filter: true,
