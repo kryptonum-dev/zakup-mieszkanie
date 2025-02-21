@@ -1,0 +1,25 @@
+{
+  "name": "zakup-mieszkanie",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kryptonum-dev/zakup-mieszkanie"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "bun@1.1.26",
+  "private": true,
+  "scripts": {
+    "build": "dotenv -- turbo build",
+    "dev": "dotenv -- turbo dev",
+    "lint": "dotenv -- turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "devDependencies": {
+    "turbo": "^2.4.2",
+    "dotenv-cli": "^7.4.1"
+  }
+}

@@ -1,0 +1,28 @@
+---
+import type { ComponentsProps } from '../components/Components.astro'
+import { Components_Query } from '../components/Components.astro'
+import sanityFetch from '../utils/sanity.fetch'
+import metadataFetch from '../utils/metadata.fetch'
+import Layout from '../layouts/Layout.astro'
+import Components from '../components/Components.astro'
+
+const page = await sanityFetch<{
+  name: string
+  slug: string
+  components: ComponentsProps
+}>({
+  query: `
+    *[_type == "NotFound_Page"][0] {
+      "slug": slug.current,
+      ${Components_Query}
+    }
+  `,
+})
+
+const metadata = await metadataFetch(page.slug)
+---
+
+<Layout {...metadata}>
+  <h1>Not Found Page</h1>
+  <Components data={page.components} />
+</Layout>

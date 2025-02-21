@@ -1,0 +1,104 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = {
+  asLabel?: boolean
+  inputProps?: HTMLAttributes<'input'>
+} & HTMLAttributes<'label'>
+
+const { inputProps, asLabel, ...props } = Astro.props
+
+const Element = asLabel ? 'label' : 'div'
+---
+
+<Element data-switch {...props}>
+  <input type="checkbox" {...inputProps} />
+  <div class="toggle-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" fill="none">
+      <path stroke="#FFE6A2" stroke-linecap="round" stroke-linejoin="round" d="m11.2 6.1-4.772 4.8L4.8 9.264"></path>
+    </svg>
+  </div>
+</Element>
+
+<style lang="scss">
+  [data-switch] {
+    cursor: pointer;
+    width: 44px;
+    height: 24px;
+    margin: 4px 0;
+    border-radius: 12px;
+    border: 2px solid var(--neutral-300, #d4d4d4);
+    background-color: var(--neutral-200, #e5e5e5);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      border-color: var(--neutral-400, #a3a3a3);
+      .toggle-icon {
+        background-color: var(--neutral-50, #fafafa);
+      }
+    }
+
+    &:has(input:focus-visible) {
+      outline: 2px solid var(--primary-300, #93c5fd);
+      outline-offset: 2px;
+    }
+
+    &:has(input:checked) {
+      border-color: var(--primary-500, #3b82f6);
+      background-color: var(--primary-500, #3b82f6);
+
+      .toggle-icon {
+        transform: translateX(20px);
+        background: #ffffff;
+
+        svg {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
+      &:hover {
+        border-color: var(--primary-600, #2563eb);
+        background-color: var(--primary-600, #2563eb);
+      }
+    }
+
+    &:has(input:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+  }
+
+  .toggle-icon {
+    margin: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--neutral-400, #a3a3a3);
+    border-radius: 50%;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: grid;
+    place-items: center;
+
+    svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0;
+      transform: scale(0.5) rotate(-45deg);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      path {
+        stroke: var(--primary-500, #3b82f6);
+        stroke-width: 2;
+      }
+    }
+  }
+</style>

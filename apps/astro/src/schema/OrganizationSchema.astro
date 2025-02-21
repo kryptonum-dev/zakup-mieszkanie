@@ -1,0 +1,115 @@
+---
+import sanityFetch from '@/utils/sanity.fetch'
+import { DOMAIN } from '@/global/constants'
+import icon from '@/assets/icon.png'
+
+const {
+  socials,
+  OrganizationSchema: organizationSchema,
+  email,
+  tel,
+  address,
+} = await sanityFetch<{
+  socials: { facebook: string; instagram: string; linkedin: string; tiktok: string }
+  OrganizationSchema: {
+    name: string
+    description: string
+    businessDetails?: {
+      vatID?: string
+      regon?: string
+      legalName?: string
+      foundingDate?: string
+      founder?: string
+    }
+  }
+  email: string
+  tel: string
+  address: { street: string; city: string; postalCode: string; country: string; mapLink: string }
+}>({
+  query: `
+    *[_type == "global"][0] {
+      socials,
+      OrganizationSchema,
+      email,
+      tel,
+      address,
+    }
+  `,
+})
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${DOMAIN}/#organization`,
+  name: organizationSchema.name,
+  description: organizationSchema.description,
+  url: DOMAIN,
+  ...(email && { email: email }),
+  ...(tel && { telephone: tel }),
+  ...(socials && { sameAs: [socials.facebook, socials.instagram, socials.linkedin, socials.tiktok].filter(Boolean) }),
+  image: [
+    {
+      '@type': 'ImageObject',
+      url: icon.src,
+      width: '512',
+      height: '512',
+    },
+  ],
+  logo: {
+    '@type': 'ImageObject',
+    url: icon.src,
+    width: '512',
+    height: '512',
+    caption: organizationSchema.name,
+  },
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens: '00:00',
+    closes: '00:00',
+    validFrom: organizationSchema.businessDetails?.foundingDate,
+  },
+  ...(address && {
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: address.street,
+      addressLocality: address.city,
+      postalCode: address.postalCode,
+      addressCountry: address.country,
+    },
+  }),
+
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    ...(email && { email: email }),
+    ...(tel && { telephone: tel }),
+    availableLanguage: ['pl'],
+  },
+  ...(organizationSchema.businessDetails?.foundingDate && {
+    foundingDate: organizationSchema.businessDetails.foundingDate,
+  }),
+  ...(organizationSchema.businessDetails?.vatID && {
+    vatID: organizationSchema.businessDetails.vatID,
+    taxID: organizationSchema.businessDetails.vatID,
+  }),
+  naics: '337110',
+  ...(organizationSchema.businessDetails?.regon && { iso6523Code: `0191:${organizationSchema.businessDetails.regon}` }),
+  ...(organizationSchema.businessDetails?.legalName && { legalName: organizationSchema.businessDetails.legalName }),
+  ...(organizationSchema.businessDetails?.founder && {
+    founder: {
+      '@type': 'Person',
+      name: organizationSchema.businessDetails.founder,
+    },
+  }),
+  areaServed: {
+    '@type': 'Place',
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'PL',
+    },
+  },
+}
+---
+
+<script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
