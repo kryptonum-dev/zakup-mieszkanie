@@ -1,14 +1,13 @@
 import styles from './Button.module.scss'
 
-export type Props = React.HTMLAttributes<HTMLAnchorElement> &
-  React.ButtonHTMLAttributes<HTMLButtonElement> & {
-    text?: string | React.ReactNode
-    children: React.ReactNode
-    theme?: 'primary' | 'secondary'
-    linkType?: 'external' | 'internal'
-    href?: string
-    className?: string
-  }
+export type Props = {
+  text?: string | React.ReactNode
+  children: React.ReactNode
+  theme?: 'primary' | 'secondary'
+  linkType?: 'external' | 'internal'
+  href?: string
+  className?: string
+} & React.HTMLAttributes<HTMLAnchorElement> & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function Button({
   children,
@@ -31,7 +30,7 @@ export default function Button({
 
   return (
     <Element {...renderedProps}>
-      <div className={styles.content}>{children}</div>
+      {text || children}
     </Element>
   )
 }
