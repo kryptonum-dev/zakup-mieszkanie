@@ -1,6 +1,7 @@
 export const prerender = false
 
 import { REGEX, RESEND_API_KEY } from '@/global/constants'
+import { isPreviewDeployment } from '@/src/utils/is-preview-deployment'
 import { generateEventIdentifiers } from '@/utils/event-identifiers'
 import { htmlToString } from '@/utils/html-to-string'
 import type { APIRoute } from 'astro'
@@ -88,31 +89,33 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const { event_id, event_time } = generateEventIdentifiers()
-    const conversionData = {
-      name,
-      email,
-      eventName: 'Lead',
-      eventSource: 'website',
-      contentName: 'Contact Form Submission',
-      slug,
-      event_id,
-      event_time,
-    }
+    if (!isPreviewDeployment) {
+      try {
+        const { event_id, event_time } = generateEventIdentifiers()
+        const conversionData = {
+          name,
+          email,
+          eventName: 'Lead',
+          eventSource: 'website',
+          contentName: 'Contact Form Submission',
+          slug,
+          event_id,
+          event_time,
+        }
 
-    try {
-      const response = await fetch('/api/meta-conversions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(conversionData),
-      })
+        const response = await fetch('/api/meta-conversions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(conversionData),
+        })
 
-      if (!response.ok) {
-        const data = await response.json()
-        console.warn('Meta conversion event failed:', data.message)
+        if (!response.ok) {
+          const data = await response.json()
+          throw new Error(data.message)
+        }
+      } catch (error) {
+        throw new Error('Failed to send Meta conversion event')
       }
-    } catch (error) {
-      console.warn('Failed to send Meta conversion event:', error)
     }
 
     return new Response(
