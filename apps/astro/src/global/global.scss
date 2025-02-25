@@ -1,13 +1,39 @@
 @font-face {
-  font-family: 'Poppins';
-  src:
-    url('/fonts/Poppins-Regular.woff2') format('woff2'),
-    url('/fonts/Poppins-Regular.woff') format('woff'),
-    url('/fonts/Poppins-Regular.ttf') format('truetype'),
-    url('/fonts/Poppins-Regular.eot') format('embedded-opentype');
+  font-family: 'PT Sans';
+  src: url('/fonts/PTSans-Regular.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
   font-style: normal;
+}
+@font-face {
+  font-family: 'PT Sans';
+  src: url('/fonts/PTSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'PT Sans Fallback';
+  src: local('Arial');
+  ascent-override: 105.3%;
+  descent-override: 28.55%;
+  line-gap-override: 0%;
+  size-adjust: 96.68%;
+}
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lora Fallback';
+  src: local('Times New Roman');
+  ascent-override: 87.33%;
+  descent-override: 23.78%;
+  line-gap-override: 0%;
+  size-adjust: 115.2%;
 }
 
 *,
@@ -121,7 +147,7 @@ body {
   -webkit-tap-highlight-color: transparent;
   background: var(--background-100, #fffcf9);
   color: var(--primary-900, #001b19);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'PT Sans', 'PT Sans Fallback', sans-serif;
   font-size: 1rem;
   line-height: 158%;
 }
@@ -155,6 +181,7 @@ h6,
   font-weight: 400;
   line-height: 128%;
   color: var(--primary-800, #01403b);
+  font-family: 'Lora', 'Lora Fallback', serif;
   strong {
     font-weight: 400;
     color: var(--primary-900, #001b19);
