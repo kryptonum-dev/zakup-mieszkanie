@@ -1,7 +1,7 @@
 ---
-import { ImageDataQuery, type ImageDataProps } from '../ui/image'
-import PortableText, { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
-import { ButtonDataQuery, type ButtonDataProps } from '../ui/button'
+import PortableText, { PortableTextQuery, type PortableTextValue } from '@components/ui/portable-text'
+import Image, { ImageDataQuery, type ImageDataProps } from '@components/ui/image'
+import Button, { ButtonDataQuery, type ButtonDataProps } from '@components/ui/button'
 
 export const HeroSection_Query = `
   _type == "HeroSection" => {
@@ -14,21 +14,49 @@ export const HeroSection_Query = `
 
 type Props = {
   index: number
-  image: ImageDataProps
   sectionId?: string
+  image: ImageDataProps
   heading: PortableTextValue
   paragraph: PortableTextValue
   cta: ButtonDataProps
 }
 
-const { index, sectionId, heading, paragraph, image, cta } = Astro.props
+const { index, sectionId, image, heading, paragraph, cta } = Astro.props
 ---
 
 <section class="HeroSection" id={sectionId}>
-  <PortableText value={heading} />
+  <header>
+    <PortableText value={heading} heading={index === 0 ? 'h1' : 'h2'} />
+    <PortableText value={paragraph} class="paragraph" />
+    <Button {...cta} />
+  </header>
+  <Image {...image} sizes="50vw" priority={true} class="image" />
 </section>
 
 <style lang="scss">
   .HeroSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    header {
+      padding: clamp(4rem, calc(6vw / 0.48), 13rem) 0;
+      .paragraph {
+        margin: clamp(1rem, calc(1vw / 0.48), 1.25rem) 0 clamp(1.5rem, calc(2vw / 0.48), 2rem);
+      }
+    }
+    .image {
+      order: -1;
+      max-width: calc(100% + var(--page-margin));
+      height: 100%;
+      margin: 0 calc(var(--page-margin) * -1);
+    }
+    @media (max-width: 60rem) {
+      grid-template-columns: 1fr;
+      gap: 0;
+      .image {
+        order: 1;
+        max-width: calc(100% + (var(--page-margin) * 2));
+      }
+    }
   }
 </style>
