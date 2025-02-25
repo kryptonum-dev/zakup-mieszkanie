@@ -2,7 +2,6 @@
 import Switch from '@/components/ui/Switch.astro'
 import Button from '@/components/ui/button'
 import { getPageAnalyticsData } from '../utils/page-data'
-import { isPreviewDeployment } from '@/utils/is-preview-deployment'
 
 type Props = {
   slug?: string
@@ -55,7 +54,7 @@ const groups = [
 ---
 
 {
-  analytics.gtmId && !isPreviewDeployment && (
+  analytics.gtmId && (
     <noscript>
       <iframe
         src={`https://www.googletagmanager.com/ns.html?id=${analytics.gtmId}`}
@@ -321,16 +320,10 @@ const groups = [
   }
 </style>
 
-<script is:inline define:vars={{ gtmId, additionalData, isPreviewDeployment }}>
-  // Only initialize dataLayer if not in preview
-  if (!isPreviewDeployment) {
-    window.dataLayer = window.dataLayer || []
-  }
-
+<script is:inline define:vars={{ gtmId, additionalData }}>
+  window.dataLayer = window.dataLayer || []
   function gtag() {
-    if (!isPreviewDeployment) {
-      window.dataLayer.push(arguments)
-    }
+    window.dataLayer.push(arguments)
   }
 
   const timestamp = Math.floor(Date.now() / 1000)
@@ -363,8 +356,6 @@ const groups = [
   }
 
   function trackEvent(eventName, customData = {}) {
-    if (isPreviewDeployment) return
-
     const event_id = crypto.randomUUID()
     const event_time = timestamp
 
@@ -425,19 +416,17 @@ const groups = [
   const denyButton = cookieConsentElement.querySelector('.deny')
   let isPreferencesOpen = false
 
-  // Initialize GTM only in non-preview environments
-  if (!isPreviewDeployment) {
-    ;(function (w, d, s, l, i) {
-      w[l] = w[l] || []
-      w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
-      var f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s),
-        dl = l != 'dataLayer' ? '&l=' + l : ''
-      j.async = true
-      j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
-      f.parentNode.insertBefore(j, f)
-    })(window, document, 'script', 'dataLayer', gtmId)
-  }
+  // Initialize GTM
+  ;(function (w, d, s, l, i) {
+    w[l] = w[l] || []
+    w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != 'dataLayer' ? '&l=' + l : ''
+    j.async = true
+    j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+    f.parentNode.insertBefore(j, f)
+  })(window, document, 'script', 'dataLayer', gtmId)
 
   if (getCookie('cookie-consent') === null) {
     gtag('consent', 'default', {
