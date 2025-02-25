@@ -1,0 +1,198 @@
+---
+import sanityFetch from '@utils/sanity.fetch'
+import Button, { type ButtonDataProps } from '@components/ui/button'
+
+const { slug: _slug = '' } = Astro.params
+const slug = `/${_slug || ''}`
+
+type HeaderProps = {
+  navigation: {
+    text: string
+    href: string
+  }[]
+  cta: ButtonDataProps
+}
+
+const data = await sanityFetch<HeaderProps>({
+  query: `
+    *[_type == "page" && slug.current == $slug][0].localSettings.header {
+      navigation[] {
+        text,
+        href
+      },
+      cta {
+        text,
+        href,
+        theme
+      }
+    }
+  `,
+  params: { slug: slug },
+})
+---
+
+<header class="header" data-layout-header>
+  <div class="max-width">
+    <button class="menu-button" aria-label="Otwórz menu" aria-expanded="false" aria-controls="main-navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <nav id="main-navigation" aria-hidden="true">
+      <ul>
+        {
+          data.navigation.map(({ href, text }) => (
+            <li>
+              <a href={href} class="link">
+                {text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <a href="/" class="logo" aria-label="Strona główna">
+      <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" viewBox="0 0 512 512">
+        <path fill="#E6DBD1" d="M0 0h512v512H0z"></path><path
+          stroke="#341E0A"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="18"
+          d="M84 397h34.4m0 0h103.2m-103.2 0V250.023c0-9.187 0-13.784 1.118-18.059a34.359 34.359 0 0 1 4.828-10.614c2.483-3.656 5.933-6.688 12.85-12.738l82.587-72.241c12.822-11.216 19.234-16.825 26.455-18.959a34.435 34.435 0 0 1 19.521 0c7.226 2.136 13.647 7.75 26.489 18.983l82.56 72.217c6.916 6.05 10.368 9.082 12.851 12.738a34.353 34.353 0 0 1 4.816 10.614c1.117 4.275 1.125 8.872 1.125 18.059V397m-172 0h68.8m-68.8 0v-68.778c0-18.993 15.401-34.389 34.4-34.389s34.4 15.396 34.4 34.389V397m0 0h103.2m0 0H428">
+        </path>
+      </svg>
+    </a>
+    <Button {...data.cta} className="cta" />
+  </div>
+</header>
+<div class="overlay" aria-hidden="true" data-layout-header-overlay></div>
+
+<style lang="scss">
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 9;
+    height: 4.75rem;
+    background-color: var(--primary-100, #f2ede8);
+    border-bottom: 1px solid var(--primary-200, #e6dbd1);
+    .max-width {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 2rem;
+    }
+    .menu-button {
+      display: none;
+      justify-self: start;
+      gap: 5px;
+      align-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      span {
+        display: block;
+        width: 32px;
+        height: 2px;
+        background-color: var(--primary-700);
+        transition: transform 300ms var(--easing);
+      }
+      &[aria-expanded='true'] {
+        span {
+          &:first-child {
+            transform: translateY(7px) rotate(45deg);
+          }
+          &:nth-child(2) {
+            transform: scaleX(0);
+          }
+          &:last-child {
+            transform: translateY(-7px) rotate(-45deg);
+          }
+        }
+      }
+    }
+    nav {
+      ul {
+        display: flex;
+        gap: 1.5rem;
+      }
+    }
+    .cta {
+      justify-self: end;
+    }
+    @media (max-width: 56.1875rem) {
+      .max-width {
+        grid-template-columns: auto auto auto;
+      }
+      .menu-button {
+        display: grid;
+        &[aria-expanded='true'] + nav {
+          transform: translateX(0);
+        }
+      }
+      &:has(.menu-button[aria-expanded='true']) {
+        + .overlay {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      }
+      nav {
+        padding: var(--page-margin);
+        background: var(--primary-100);
+        position: absolute;
+        top: 4.75rem;
+        left: 0;
+        width: 100%;
+        max-width: 20rem;
+        overflow-y: auto;
+        height: calc(100vh - 4.75rem);
+        height: calc(100dvh - 4.75rem);
+        font-size: 1.25rem;
+        transition: transform 500ms var(--easing);
+        transform: translateX(-100%);
+
+        ul {
+          flex-direction: column;
+          gap: 1.5rem;
+          a {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 8;
+    transition: opacity 500ms var(--easing);
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  const header = document.querySelector('[data-layout-header]')!
+  const menuButton = header.querySelector('.menu-button')!
+  const navigation = header.querySelector('#main-navigation')!
+  const overlay = document.querySelector('[data-layout-header-overlay]')!
+
+  menuButton.addEventListener('click', () => {
+    const isExpanded = menuButton.getAttribute('aria-expanded') === 'true'
+    menuButton.setAttribute('aria-expanded', (!isExpanded).toString())
+    navigation.setAttribute('aria-hidden', isExpanded.toString())
+    menuButton.setAttribute('aria-label', !isExpanded ? 'Zamknij menu' : 'Otwórz menu')
+  })
+
+  const closeMenu = () => {
+    menuButton.setAttribute('aria-expanded', 'false')
+    navigation.setAttribute('aria-hidden', 'true')
+    menuButton.setAttribute('aria-label', 'Otwórz menu')
+  }
+  overlay.addEventListener('click', closeMenu)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu()
+  })
+</script>
