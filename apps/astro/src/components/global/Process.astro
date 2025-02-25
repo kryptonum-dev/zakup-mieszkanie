@@ -1,13 +1,8 @@
 ---
-import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
+import PortableText, { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
 import { ImageDataQuery, type ImageDataProps } from '../ui/image'
-import { ButtonDataQuery, type ButtonDataProps } from '../ui/button'
-
-type Step = {
-  icon: ImageDataProps
-  heading: string
-  paragraph: string
-}
+import Button, { ButtonDataQuery, type ButtonDataProps } from '../ui/button'
+import imageToInlineSvg from '@utils/image-to-inline-svg'
 
 export const Process_Query = `
   _type == "Process" => {
@@ -28,15 +23,97 @@ type Props = {
   label: string
   heading: PortableTextValue
   cta: ButtonDataProps
-  steps: Step[]
+  steps: Array<{
+    icon: ImageDataProps
+    heading: PortableTextValue
+    paragraph: PortableTextValue
+  }>
 }
 
 const { index, sectionId, label, heading, cta, steps } = Astro.props
+
+const Label = index === 0 ? 'h2' : 'h3'
 ---
 
-<section class="Process" id={sectionId}></section>
+<section class="Process" id={sectionId}>
+  <header>
+    <Label class="heading-label">{label}</Label>
+    <PortableText value={heading} heading={index === 0 ? 'h1' : 'h2'} />
+    <Button {...cta} className="cta" />
+  </header>
+  <ul class="steps">
+    {
+      steps.map(({ icon, heading, paragraph }) => (
+        <li class="step">
+          <div class="icon">
+            <Fragment set:html={imageToInlineSvg(icon.asset.url)} />
+          </div>
+          <div class="content">
+            <PortableText value={heading} heading={index === 0 ? 'h2' : 'h3'} class="h3" />
+            <PortableText value={paragraph} />
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>
 
 <style lang="scss">
   .Process {
+    padding: clamp(4rem, calc(5vw / 0.48), 7rem) 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem clamp(2rem, calc(3vw / 0.48), 3rem);
+    header {
+      .cta {
+        margin-top: clamp(1.5rem, calc(2vw / 0.48), 2rem);
+      }
+    }
+    .steps {
+      display: grid;
+      gap: 1rem;
+      .step {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: clamp(1rem, calc(1.5vw / 0.48), 1.5rem);
+        .icon {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          :global(svg) {
+            width: 3rem;
+            height: 3rem;
+            flex-shrink: 0;
+          }
+          &::after {
+            content: '';
+            width: 1px;
+            flex-grow: 1;
+            background: var(--primary-700, #271607);
+          }
+        }
+        .content {
+          padding-bottom: 3rem;
+          .h3 {
+            margin: 0.25rem 0 clamp(0.75rem, calc(1vw / 0.48), 1rem);
+          }
+        }
+        &:last-child {
+          .icon {
+            &::after {
+              display: none;
+            }
+          }
+          .content {
+            padding-bottom: 0;
+          }
+        }
+      }
+    }
+    @media (max-width: 65rem) {
+      grid-template-columns: 1fr;
+      max-width: 48rem;
+    }
   }
 </style>
