@@ -1,6 +1,6 @@
 ---
 import { ImageDataQuery, type ImageDataProps } from '../ui/image'
-import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
+import PortableText, { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
 import { ButtonDataQuery, type ButtonDataProps } from '../ui/button'
 
 export const HeroSection_Query = `
@@ -24,7 +24,9 @@ type Props = {
 const { index, sectionId, heading, paragraph, image, cta } = Astro.props
 ---
 
-<section class="HeroSection" id={sectionId}></section>
+<section class="HeroSection" id={sectionId}>
+  <PortableText value={heading} />
+</section>
 
 <style lang="scss">
   .HeroSection {
