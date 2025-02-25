@@ -1,6 +1,7 @@
 ---
-import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
+import PortableText, { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
 import { ImageDataQuery, type ImageDataProps } from '../ui/image'
+import imageToInlineSvg from '@utils/image-to-inline-svg'
 
 type Feature = {
   icon: ImageDataProps
@@ -10,7 +11,6 @@ type Feature = {
 
 export const Features_Query = `
   _type == "Features" => {
-    ${ImageDataQuery('image')}
     ${PortableTextQuery('heading')}
     features[] {
       ${ImageDataQuery('icon')}
@@ -23,17 +23,58 @@ export const Features_Query = `
 type Props = {
   index: number
   sectionId?: string
-  image: ImageDataProps
   heading: PortableTextValue
   features: Feature[]
 }
 
-const { index, sectionId, image, heading, features } = Astro.props
+const { index, sectionId, heading, features } = Astro.props
 ---
 
-<section class="Features" id={sectionId}></section>
+<section class="Features" id={sectionId}>
+  <header>
+    <PortableText value={heading} heading={index === 0 ? 'h1' : 'h2'} />
+  </header>
+  <ul class="features">
+    {
+      features.map(({ heading, paragraph, icon }) => (
+        <li class="feature">
+          <Fragment set:html={imageToInlineSvg(icon.asset.url)} />
+          <PortableText value={heading} heading={index === 0 ? 'h3' : 'h4'} class="h3" />
+          <PortableText value={paragraph} />
+        </li>
+      ))
+    }
+  </ul>
+</section>
 
 <style lang="scss">
   .Features {
+    padding: clamp(4rem, calc(5vw / 0.48), 7rem) 0;
+    header {
+      max-width: 48rem;
+      margin-bottom: clamp(2rem, calc(3vw / 0.48), 4rem);
+    }
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: clamp(2rem, calc(3vw / 0.48), 3rem);
+      :global(svg) {
+        width: 3rem;
+        height: 3rem;
+      }
+      .h3 {
+        margin: clamp(1.25rem, calc(1.5vw / 0.48), 1.5rem) 0 clamp(0.75rem, calc(1vw / 0.48), 1rem);
+      }
+    }
+    @media (max-width: 68rem) {
+      .features {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 43rem) {
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
   }
 </style>
