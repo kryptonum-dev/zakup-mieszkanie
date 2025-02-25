@@ -10,7 +10,7 @@ export const DOMAIN: string = 'https://zakup-mieszkanie-astro-git-dev-kryptonum.
  * This constant defines the URL where content previews are rendered.
  * @constant
  */
-export const PREVIEW_DOMAIN: string = 'http://localhost:4321'
+export const PREVIEW_DOMAIN: string = 'https://zakup-mieszkanie-astro-git-dev-kryptonum.vercel.app/'
 
 /**
  * Sanity project identifier.
