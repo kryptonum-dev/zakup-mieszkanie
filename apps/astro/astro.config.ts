@@ -17,6 +17,9 @@ export default defineConfig({
     ],
   },
   vite: {
+    ssr: {
+      noExternal: [],
+    },
     css: {
       preprocessorOptions: {
         scss: {
