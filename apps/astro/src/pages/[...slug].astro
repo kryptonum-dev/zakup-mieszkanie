@@ -1,5 +1,7 @@
 ---
-export const prerender = true
+import { isPreviewDeployment } from '@/utils/is-preview-deployment'
+
+export const prerender = !isPreviewDeployment
 
 import Layout from '@/src/layouts/Layout.astro'
 import Components, { type ComponentsProps, Components_Query } from '@/components/Components.astro'
@@ -7,15 +9,19 @@ import metadataFetch from '@/utils/metadata.fetch'
 import sanityFetch from '@/utils/sanity.fetch'
 
 export async function getStaticPaths() {
-  const pages = await sanityFetch<Array<{ slug: string }>>({
-    query: `*[_type == "page" && defined(slug.current)] {
-      "slug": slug.current
-    }`,
-  })
+  if (!isPreviewDeployment) {
+    const pages = await sanityFetch<Array<{ slug: string }>>({
+      query: `*[_type == "page" && defined(slug.current)] {
+        "slug": slug.current
+      }`,
+    })
 
-  return pages.map((page) => ({
-    params: { slug: page.slug },
-  }))
+    return pages.map((page) => ({
+      params: { slug: page.slug },
+    }))
+  }
+
+  return []
 }
 
 const { slug } = Astro.params
