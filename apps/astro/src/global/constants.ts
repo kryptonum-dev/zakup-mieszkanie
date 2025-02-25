@@ -4,7 +4,7 @@
  * @constant
  * @type {string}
  */
-export const THEME_COLOR: string = '#011310'
+export const THEME_COLOR: string = '#824c1a'
 
 /**
  * Global declaration of background color in HEX format.
@@ -12,7 +12,7 @@ export const THEME_COLOR: string = '#011310'
  * @constant
  * @type {string}
  */
-export const BACKGROUND_COLOR: string = '#000103'
+export const BACKGROUND_COLOR: string = '#f2ede8'
 
 /**
  * Global declaration of the locale (language) for the application.
@@ -28,7 +28,7 @@ export const LOCALE: string = 'pl'
  * @constant
  * @type {string}
  */
-export const DOMAIN: string = 'https://zakup-mieszkanie-astro-git-dev-kryptonum.vercel.app/'
+export const DOMAIN: string = 'https://zakupmieszkanie.pl'
 
 /**
  * Global declaration of the default title for the application.
@@ -36,7 +36,7 @@ export const DOMAIN: string = 'https://zakup-mieszkanie-astro-git-dev-kryptonum.
  * @constant
  * @type {string}
  */
-export const DEFAULT_TITLE: string = 'Kryptonum'
+export const DEFAULT_TITLE: string = 'Zakup Mieszkanie'
 
 /**
  * Global declaration of the default description for the application.
@@ -45,8 +45,7 @@ export const DEFAULT_TITLE: string = 'Kryptonum'
  * @constant
  * @type {string}
  */
-export const DEFAULT_DESCRIPTION: string =
-  'Kryptonum tworzy nieszablonowe projekty tym, którym zależy na: 👨🏻‍💻 profesjonalnej stronie, 🎨 unikatowym brandingu, 💰 dochodowym biznesie online.'
+export const DEFAULT_DESCRIPTION: string = 'Znajdź idealne mieszkanie bez stresu i tracenia czasu. Skorzystaj z naszej wiedzy o rynku nieruchomości i zyskaj najlepszą ofertę dopasowaną do Twoich potrzeb.';
 
 /**
  * Object containing regular expressions for validation purposes.
@@ -100,4 +99,4 @@ export const DATASET: string = 'production'
  * @constant
  * @type {string}
  */
-export const API_VERSION: string = '2024-10-15'
+export const API_VERSION: string = '2025-02-25'
