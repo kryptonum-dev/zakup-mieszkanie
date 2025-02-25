@@ -30,7 +30,9 @@ const { index, sectionId, image, heading, paragraph, cta } = Astro.props
     <PortableText value={paragraph} class="paragraph" />
     <Button {...cta} />
   </header>
-  <Image {...image} sizes="50vw" priority={true} class="image" />
+  <div class="image">
+    <Image {...image} sizes="(max-width: 60rem) 100vw, 50vw" priority={true} />
+  </div>
 </section>
 
 <style lang="scss">
@@ -46,16 +48,22 @@ const { index, sectionId, image, heading, paragraph, cta } = Astro.props
     }
     .image {
       order: -1;
-      max-width: calc(100% + var(--page-margin));
-      height: 100%;
-      margin: 0 calc(var(--page-margin) * -1);
+      position: relative;
+      img {
+        max-width: calc(100% + var(--page-margin));
+        margin: 0 calc(var(--page-margin) * -1);
+        position: absolute;
+      }
     }
     @media (max-width: 60rem) {
       grid-template-columns: 1fr;
       gap: 0;
       .image {
         order: 1;
-        max-width: calc(100% + (var(--page-margin) * 2));
+        img {
+          max-width: calc(100% + (var(--page-margin) * 2));
+          position: static;
+        }
       }
     }
   }
