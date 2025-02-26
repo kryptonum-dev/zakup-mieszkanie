@@ -30,7 +30,7 @@ const data = await sanityFetch<{
 const metadata = await metadataFetch('/polityka-prywatnosci')
 ---
 
-<Layout {...metadata}>
+<Layout {...metadata} hideHeader>
   <Breadcrumbs data={[{ name: data.name, path: data.slug }]} />
   <section class="header">
     <PortableText value={data.header.heading} heading="h1" class="heading h2" />

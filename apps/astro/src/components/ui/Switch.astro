@@ -11,94 +11,72 @@ const { inputProps, asLabel, ...props } = Astro.props
 const Element = asLabel ? 'label' : 'div'
 ---
 
-<Element data-switch {...props}>
+<Element data-switch-element {...props}>
   <input type="checkbox" {...inputProps} />
   <div class="toggle-icon">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" fill="none">
-      <path stroke="#FFE6A2" stroke-linecap="round" stroke-linejoin="round" d="m11.2 6.1-4.772 4.8L4.8 9.264"></path>
+    <svg xmlns="http://www.w3.org/2000/svg" width="0.625rem" height="0.5rem" fill="none" viewBox="0 0 10 8">
+      <path stroke="#f2ede8" stroke-linecap="round" stroke-linejoin="round" d="M9 1 3.034 7 1 4.955"></path>
     </svg>
   </div>
 </Element>
 
 <style lang="scss">
-  [data-switch] {
+  [data-switch-element] {
+    box-sizing: content-box;
     cursor: pointer;
-    width: 44px;
-    height: 24px;
-    margin: 4px 0;
-    border-radius: 12px;
-    border: 2px solid var(--neutral-300, #d4d4d4);
-    background-color: var(--neutral-200, #e5e5e5);
-    transition: all 0.2s ease;
+    width: 3.375rem;
+    height: 2rem;
+    border-radius: 3.375rem;
+    border: 1px solid var(--primary-600, #271607);
+    background-color: var(--primary-100, #f2ede8);
     position: relative;
-    overflow: hidden;
-
+    &::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 2.75rem;
+      height: 2.75rem;
+      transform: translate(-50%, -50%);
+    }
+    transition: background-color 500ms var(--easing);
     &:hover {
-      border-color: var(--neutral-400, #a3a3a3);
-      .toggle-icon {
-        background-color: var(--neutral-50, #fafafa);
-      }
+      background-color: var(--primary-200, #e6dbd1);
     }
-
     &:has(input:focus-visible) {
-      outline: 2px solid var(--primary-300, #93c5fd);
-      outline-offset: 2px;
+      outline: 2px solid var(--primary-700, #271607);
+      outline-offset: 3px;
     }
-
     &:has(input:checked) {
-      border-color: var(--primary-500, #3b82f6);
-      background-color: var(--primary-500, #3b82f6);
-
+      background-color: var(--primary-200, #e6dbd1);
       .toggle-icon {
-        transform: translateX(20px);
-        background: #ffffff;
-
+        transform: translateX(1.375rem);
         svg {
-          opacity: 1;
-          transform: scale(1) rotate(0deg);
+          stroke-dashoffset: 24;
         }
       }
-
-      &:hover {
-        border-color: var(--primary-600, #2563eb);
-        background-color: var(--primary-600, #2563eb);
-      }
     }
-
     &:has(input:disabled) {
-      opacity: 0.5;
-      cursor: not-allowed;
+      opacity: 0.62;
     }
-
     input {
       position: absolute;
       opacity: 0;
-      cursor: pointer;
-      height: 0;
-      width: 0;
     }
   }
-
   .toggle-icon {
-    margin: 2px;
-    width: 16px;
-    height: 16px;
-    background: var(--neutral-400, #a3a3a3);
+    width: 1.75rem;
+    height: 1.75rem;
+    margin: 0.125rem;
     border-radius: 50%;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: var(--primary-600, #271607);
     display: grid;
     place-items: center;
-
+    transition: transform 500ms var(--easing);
     svg {
-      width: 12px;
-      height: 12px;
-      opacity: 0;
-      transform: scale(0.5) rotate(-45deg);
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      path {
-        stroke: var(--primary-500, #3b82f6);
-        stroke-width: 2;
-      }
+      stroke-dasharray: 12;
+      stroke-dashoffset: 12;
+      transition: stroke-dashoffset 500ms var(--easing);
     }
   }
 </style>
