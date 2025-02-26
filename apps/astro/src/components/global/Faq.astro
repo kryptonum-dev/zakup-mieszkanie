@@ -1,6 +1,19 @@
 ---
-import { PortableTextQuery, type PortableTextValue } from '../ui/portable-text'
-import { ButtonDataQuery, type ButtonDataProps } from '../ui/button'
+import PortableText, { PortableTextQuery, type PortableTextValue } from '@components/ui/portable-text'
+import Button, { ButtonDataQuery, type ButtonDataProps } from '@components/ui/button'
+import Accordion from '@components/ui/Accordion.astro'
+
+type Props = {
+  index: number
+  sectionId?: string
+  heading: PortableTextValue
+  paragraph: PortableTextValue
+  cta: ButtonDataProps
+  faqItems: {
+    question: PortableTextValue
+    answer: PortableTextValue
+  }[]
+}
 
 export const Faq_Query = `
   _type == "Faq" => {
@@ -14,24 +27,40 @@ export const Faq_Query = `
   },
 `
 
-type Props = {
-  index: number
-  sectionId?: string
-  heading: PortableTextValue
-  paragraph: PortableTextValue
-  cta: ButtonDataProps
-  faqItems: {
-    question: string
-    answer: PortableTextValue
-  }[]
-}
-
 const { index, sectionId, heading, paragraph, cta, faqItems } = Astro.props
 ---
 
-<section class="Faq" id={sectionId}></section>
+<section class="Faq" id={sectionId}>
+  <header>
+    <PortableText value={heading} heading={index === 0 ? 'h1' : 'h2'} />
+    <PortableText value={paragraph} class="paragraph" />
+    <Button {...cta} />
+  </header>
+  <div class="faq-items">
+    {
+      faqItems.map(({ question, answer }, i) => (
+        <Accordion summary={question} class="accordion" open={i === 0}>
+          <PortableText value={answer} />
+        </Accordion>
+      ))
+    }
+  </div>
+</section>
 
 <style lang="scss">
   .Faq {
+    padding: clamp(4rem, calc(5vw / 0.48), 7rem) 0;
+    display: grid;
+    grid-template-columns: 0.5fr 1fr;
+    gap: clamp(2rem, calc(3vw / 0.48), 5rem);
+    header {
+      .paragraph {
+        margin: clamp(1rem, calc(1vw / 0.48), 1.25rem) 0 clamp(1.5rem, calc(2vw / 0.48), 2rem);
+      }
+    }
+    @media (max-width: 65rem) {
+      max-width: 48rem;
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -42,7 +42,7 @@ export default defineField({
           fields: [
             {
               name: 'question',
-              type: 'string',
+              type: 'PortableText',
               title: 'Question',
               validation: (Rule) => Rule.required(),
             },
@@ -59,7 +59,7 @@ export default defineField({
               subtitle: 'answer',
             },
             prepare: ({ title, subtitle }) => ({
-              title,
+              title: toPlainText(title),
               subtitle: toPlainText(subtitle),
               media: icon,
             }),

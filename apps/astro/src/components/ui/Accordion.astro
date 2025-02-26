@@ -1,0 +1,130 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import PortableText, { type PortableTextValue } from '@components/ui/portable-text'
+
+type Props = {
+  summary: PortableTextValue
+} & HTMLAttributes<'details'>
+
+const { summary, ...props } = Astro.props
+---
+
+<details {...props} data-expanded={props.open ? 'true' : 'false'}>
+  <summary>
+    <PortableText value={summary} class="heading" />
+    <div class="icon"><div></div><div></div></div>
+  </summary>
+  <div class="content"><slot /></div>
+</details>
+
+<style lang="scss">
+  details {
+    border-bottom: 1px solid var(--primary-200, #e6dbd1);
+    &[data-expanded='true'] {
+      .icon {
+        transform: rotate(90deg);
+        div:last-child {
+          transform: rotate(90deg) scaleX(0);
+        }
+      }
+    }
+  }
+  summary {
+    padding: clamp(1rem, calc(1.5vw / 0.48), 1.5rem) 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: flex-start;
+    .heading {
+      font-size: clamp(1.25rem, calc(1.5vw / 0.48), 1.5rem);
+    }
+  }
+  .icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 500ms var(--easing);
+    div {
+      width: 24px;
+      height: 2px;
+      background-color: var(--primary-500, #683c14);
+      transition: transform 500ms var(--easing);
+      &:first-child {
+        position: absolute;
+        transform: rotate(90deg);
+      }
+    }
+  }
+  .content {
+    overflow: hidden;
+    transition: height 500ms var(--easing);
+    max-width: 48rem;
+    :global(> :last-child) {
+      margin-bottom: clamp(2rem, calc(3vw / 0.48), 3rem);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll('details').forEach((details) => {
+    const content = details.querySelector<HTMLDivElement>('.content')
+    const summary = details.querySelector<HTMLDivElement>('summary')
+    if (!content || !summary) return
+
+    summary.addEventListener('click', (event) => {
+      event.preventDefault()
+
+      const parent = details.parentElement
+      if (parent) {
+        parent.querySelectorAll<HTMLDetailsElement>('details[open]').forEach((openDetails) => {
+          if (openDetails !== details) {
+            const openContent = openDetails.querySelector<HTMLDivElement>('.content')
+            if (openContent) {
+              openContent.style.height = openContent.scrollHeight + 'px'
+              requestAnimationFrame(() => (openContent.style.height = '0px'))
+              openDetails.setAttribute('data-expanded', 'false')
+              openContent.addEventListener(
+                'transitionend',
+                () => {
+                  openDetails.open = false
+                  openContent.style.height = ''
+                },
+                { once: true }
+              )
+            }
+          }
+        })
+      }
+
+      // Original toggle logic for clicked accordion
+      if (details.open) {
+        content.style.height = content.scrollHeight + 'px'
+        requestAnimationFrame(() => (content.style.height = '0px'))
+        details.setAttribute('data-expanded', 'false')
+        content.addEventListener(
+          'transitionend',
+          () => {
+            details.open = false
+            content.style.height = ''
+          },
+          { once: true }
+        )
+      } else {
+        details.setAttribute('data-expanded', 'true')
+        details.open = true
+        const startHeight = content.scrollHeight + 'px'
+        content.style.height = '0px'
+        requestAnimationFrame(() => (content.style.height = startHeight))
+        content.addEventListener(
+          'transitionend',
+          () => {
+            content.style.height = ''
+          },
+          { once: true }
+        )
+      }
+    })
+  })
+</script>
