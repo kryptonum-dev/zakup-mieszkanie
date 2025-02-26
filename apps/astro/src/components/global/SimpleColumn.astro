@@ -26,13 +26,11 @@ type Props = {
 }
 
 const { index, sectionId, isReversed, label, heading, paragraph, cta, image } = Astro.props
-
-const Label = index === 0 ? 'h2' : 'h3'
 ---
 
 <section class="SimpleColumn" id={sectionId} data-reversed={isReversed}>
   <header>
-    <Label class="heading-label">{label}</Label>
+    <p class="heading-label">{label}</p>
     <PortableText value={heading} heading={index === 0 ? 'h1' : 'h2'} />
     <PortableText value={paragraph} class="paragraph" />
     <Button {...cta} />
