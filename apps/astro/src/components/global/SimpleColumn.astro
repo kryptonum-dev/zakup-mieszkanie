@@ -1,7 +1,7 @@
 ---
 import PortableText, { PortableTextQuery, type PortableTextValue } from '@components/ui/portable-text'
-import Button, { ButtonDataQuery, type ButtonDataProps } from '@components/ui/button'
-import Image, { ImageDataQuery, type ImageDataProps } from '@components/ui/image'
+import Button, { ButtonDataQuery, type ButtonDataProps } from '@components/ui/Button'
+import Image, { ImageDataQuery, type ImageDataProps } from '@components/ui/Image'
 
 export const SimpleColumn_Query = `
   _type == "SimpleColumn" => {
@@ -62,9 +62,15 @@ const Label = index === 0 ? 'h2' : 'h3'
     }
     @media (max-width: 78rem) {
       grid-template-columns: 1fr 0.5fr;
+      &[data-reversed='true'] {
+        grid-template-columns: 0.5fr 1fr;
+      }
     }
     @media (max-width: 56.1875rem) {
       grid-template-columns: 1fr;
+      &[data-reversed='true'] {
+        grid-template-columns: 1fr;
+      }
       .image {
         margin: 0 calc(var(--page-margin) * -1);
         max-width: calc(100% + (var(--page-margin) * 2));

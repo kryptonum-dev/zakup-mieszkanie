@@ -18,7 +18,6 @@ export default async function metadataFetch(slug: string): Promise<HeadProps> {
     `,
     params: { slug },
   })
-
   if (!seo?.path) throw new Error(`Missing required field \`path\` for slug \`${slug}\``)
   if (!seo?.title) throw new Error(`Missing required field \`title\` for slug \`${slug}\``)
   if (!seo?.description) throw new Error(`Missing required field \`description\` for slug \`${slug}\``)

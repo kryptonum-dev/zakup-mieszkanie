@@ -4,13 +4,14 @@
     "verbatimModuleSyntax": true,
     "baseUrl": ".",
     "paths": {
-      "@/src/*": ["./src/*"],
-      "@/global/*": ["./src/global/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/schema/*": ["./src/schema/*"],
-      "@/assets/*": ["./src/assets/*"],
-      "@/public/*": ["./public/*"]
+      "@global/*": ["./src/global/*"],
+      "@components/*": ["./src/components/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@schema/*": ["./src/schema/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@public/*": ["./public/*"],
+      "@layout/*": ["./src/layout/*"],
+      "@api/*": ["./src/pages/api/*"]
     }
   }
 }

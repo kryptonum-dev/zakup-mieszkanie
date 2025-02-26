@@ -7,7 +7,9 @@ import { isPreviewDeployment } from './src/utils/is-preview-deployment'
 
 export default defineConfig({
   site: DOMAIN,
-  integrations: [preact({ compat: true })],
+  integrations: [
+    preact({ compat: true }),
+  ],
   image: {
     remotePatterns: [
       {
@@ -18,7 +20,7 @@ export default defineConfig({
   },
   vite: {
     ssr: {
-      noExternal: [],
+      noExternal: ['react-hook-form'],
     },
     css: {
       preprocessorOptions: {
@@ -36,11 +38,11 @@ export default defineConfig({
   adapter: vercel({
     ...(!isPreviewDeployment
       ? {
-          isr: {
-            bypassToken: process.env.VERCEL_DEPLOYMENT_ID,
-            exclude: [],
-          },
-        }
+        isr: {
+          bypassToken: process.env.VERCEL_DEPLOYMENT_ID,
+          exclude: [],
+        },
+      }
       : {}),
   }),
 })

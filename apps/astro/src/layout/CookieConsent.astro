@@ -1,15 +1,9 @@
 ---
-import Switch from '@/components/ui/Switch.astro'
-import Button from '@/components/ui/button'
-import { getPageAnalyticsData } from '../utils/page-data'
+import Switch from '@components/ui/Switch.astro'
+import Button from '@components/ui/Button'
+import { getPageAnalyticsData } from '@utils/page-data'
 
-type Props = {
-  slug?: string
-}
-
-const { slug } = Astro.props
-
-if (!slug) return
+const slug = Astro.params.slug || ''
 
 const { analytics, additionalData } = await getPageAnalyticsData(slug)
 
@@ -348,7 +342,7 @@ const groups = [
     const consentSettings = JSON.parse(decodeURIComponent(cookieConsent))
     if (consentSettings.conversion_api !== 'granted') return
 
-    await fetch('/api/meta-conversions', {
+    await fetch('/api/meta-conversion', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(eventData),

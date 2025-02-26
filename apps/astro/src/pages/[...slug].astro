@@ -1,39 +1,24 @@
 ---
-export const prerender = true
+import Layout from '@layout/Layout.astro'
+import Components, { type ComponentsProps, Components_Query } from '@components/Components.astro'
+import metadataFetch from '@utils/metadata.fetch'
+import sanityFetch from '@utils/sanity.fetch'
 
-import Layout from '@/src/layouts/Layout.astro'
-import Components, { type ComponentsProps, Components_Query } from '@/components/Components.astro'
-import metadataFetch from '@/utils/metadata.fetch'
-import sanityFetch from '@/utils/sanity.fetch'
-
-export async function getStaticPaths() {
-  const pages = await sanityFetch<Array<{ slug: string }>>({
-    query: `*[_type == "page" && defined(slug.current)] {
-      "slug": slug.current
-    }`,
-  })
-
-  return pages.map((page) => ({
-    params: { slug: page.slug },
-  }))
-}
-
-const { slug } = Astro.params
-
-const _slug = `/${slug || ''}`
+const { slug: _slug } = Astro.params
+const slug = `/${_slug || ''}`
 
 const page = await sanityFetch<{ components: ComponentsProps }>({
   query: `*[_type == "page" && slug.current == $slug][0] {
     ${Components_Query}
   }`,
-  params: { slug: _slug },
+  params: { slug: slug },
 })
 
 if (!page) return Astro.rewrite('/404')
 
-const metadata = await metadataFetch(_slug as string)
+const metadata = await metadataFetch(slug)
 ---
 
-<Layout {...metadata} slug={_slug}>
+<Layout {...metadata} slug={slug}>
   <Components data={page.components} />
 </Layout>

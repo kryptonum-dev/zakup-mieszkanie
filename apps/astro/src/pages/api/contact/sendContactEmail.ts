@@ -12,6 +12,5 @@ export async function sendContactEmail({ name, email, message, legal, slug }: Pr
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, message, legal, slug }),
   })
-
   return await response.json()
 }

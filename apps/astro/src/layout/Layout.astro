@@ -1,0 +1,30 @@
+---
+import '@global/global.scss'
+import { LOCALE } from '@global/constants'
+import Head, { type Props as HeadProps } from '@layout/Head.astro'
+import OrganizationSchema from '@schema/OrganizationSchema.astro'
+import FaqPageSchema from '@schema/FaqPageSchema.astro'
+import CookieConsent from '@layout/CookieConsent.astro'
+import Header from '@layout/Header.astro'
+import Footer from '@layout/Footer.astro'
+
+const { ...props } = Astro.props as HeadProps
+---
+
+<!doctype html>
+<html lang={LOCALE}>
+  <head>
+    <Head {...props} />
+    <OrganizationSchema />
+    <FaqPageSchema />
+    <slot name="head" />
+  </head>
+  <body>
+    <CookieConsent />
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

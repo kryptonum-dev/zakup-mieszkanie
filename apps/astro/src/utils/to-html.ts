@@ -1,4 +1,4 @@
-import type { PortableTextValue } from '@/components/ui/portable-text'
+import type { PortableTextValue } from '@components/ui/portable-text'
 import sanityFetch from './sanity.fetch'
 
 const getInternalSlug = async (ref: string) => {

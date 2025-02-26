@@ -1,22 +1,18 @@
 ---
 import type { ComponentProps } from 'astro/types'
-import FullWidthPhoto, { FullWidthPhoto_Query } from '@/components/global/FullWidthPhoto.astro'
-import HeroSection, { HeroSection_Query } from '@/components/global/HeroSection.astro'
-import LocationFeatures, { LocationFeatures_Query } from '@/components/global/LocationFeatures.astro'
-import Features, { Features_Query } from '@/components/global/Features.astro'
-import Process, { Process_Query } from '@/components/global/Process.astro'
-import Benefits, { Benefits_Query } from '@/components/global/Benefits.astro'
-import ContactImage, { ContactImage_Query } from '@/components/global/ContactImage.astro'
-import Faq, { Faq_Query } from '@/components/global/Faq.astro'
-import ContactForm, { ContactForm_Query } from '@/components/global/ContactForm.astro'
+import HeroSection, { HeroSection_Query } from '@components/global/HeroSection.astro'
+import Features, { Features_Query } from '@components/global/Features.astro'
+import Process, { Process_Query } from '@components/global/Process.astro'
+import ContactImage, { ContactImage_Query } from '@components/global/ContactImage.astro'
+import Faq, { Faq_Query } from '@components/global/Faq.astro'
+import ContactForm, { ContactForm_Query } from '@components/global/ContactForm/ContactForm.astro'
+import SimpleColumn, { SimpleColumn_Query } from '@components/global/SimpleColumn.astro'
 
 const components = {
-  FullWidthPhoto,
   HeroSection,
-  LocationFeatures,
+  SimpleColumn,
   Features,
   Process,
-  Benefits,
   ContactImage,
   Faq,
   ContactForm,
@@ -41,12 +37,10 @@ export const Components_Query = /* groq */ `
   components[] {
     _type,
     sectionId,
-    ${FullWidthPhoto_Query}
     ${HeroSection_Query}
-    ${LocationFeatures_Query}
+    ${SimpleColumn_Query}
     ${Features_Query}
     ${Process_Query}
-    ${Benefits_Query}
     ${ContactImage_Query}
     ${Faq_Query}
     ${ContactForm_Query}

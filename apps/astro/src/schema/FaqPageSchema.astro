@@ -1,10 +1,10 @@
 ---
-import type { PortableTextValue } from '@/src/components/ui/portable-text'
-import { DOMAIN } from '@/global/constants'
-import sanityFetch from '@/utils/sanity.fetch'
-import { toHTML } from '@/utils/to-html'
+import type { PortableTextValue } from '@components/ui/portable-text'
+import { DOMAIN } from '@global/constants'
+import sanityFetch from '@utils/sanity.fetch'
+import { toHTML } from '@utils/to-html'
 
-const { slug } = Astro.props
+const slug = Astro.params.slug || ''
 
 const page = await sanityFetch<{
   components: {
@@ -26,7 +26,7 @@ const page = await sanityFetch<{
       }
     }
   `,
-  params: { slug: `/${slug || ''}` },
+  params: { slug: `/${slug}` },
 })
 
 if (!page?.components) return null

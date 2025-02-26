@@ -1,6 +1,6 @@
-import { hash } from '@/utils/hash'
-import { getPageAnalyticsData } from '@/utils/page-data'
 import type { APIRoute } from 'astro'
+import { hash } from '@utils/hash'
+import { getPageAnalyticsData } from '@utils/page-data'
 
 type UserData = {
   name?: string
@@ -113,13 +113,13 @@ export const POST: APIRoute = async ({ request }) => {
               user_data: {
                 ...(advancedMatchingConsent === 'granted'
                   ? {
-                      client_ip_address,
-                      client_user_agent,
-                      ...(email && { em: await hash(email) }),
-                      ...(name && { fn: name }),
-                      ...(fbc && { fbc }),
-                      ...(fbp && { fbp }),
-                    }
+                    client_ip_address,
+                    client_user_agent,
+                    ...(email && { em: await hash(email) }),
+                    ...(name && { fn: name }),
+                    ...(fbc && { fbc }),
+                    ...(fbp && { fbp }),
+                  }
                   : {}),
                 ...additionalUserData,
               },
@@ -153,7 +153,7 @@ export const POST: APIRoute = async ({ request }) => {
       { status: 200 }
     )
   } catch (error) {
-    console.error('Error in meta-conversions API:', error)
+    console.error('Error in meta-conversion API:', error)
     return new Response(
       JSON.stringify({
         message: 'An error occurred while processing the conversion event',

@@ -94,56 +94,6 @@ export default defineType({
             }),
           ],
         }),
-
-        defineField({
-          name: 'footerLinks',
-          type: 'array',
-          title: 'Footer Links',
-          validation: (Rule) => Rule.required().max(6),
-          of: [
-            {
-              type: 'object',
-              fields: [
-                defineField({
-                  name: 'text',
-                  type: 'string',
-                  title: 'Link Text',
-                  validation: (Rule) => Rule.required(),
-                }),
-                defineField({
-                  name: 'href',
-                  type: 'string',
-                  title: 'URL',
-                  description:
-                    'Use full URLs starting with "https://" for external links, or start with "/" for internal pages.',
-                  validation: (Rule) => [
-                    Rule.required(),
-                    Rule.custom((value) => {
-                      if (!value) return 'URL is required'
-                      if (!value.startsWith('https://') && !value.startsWith('/') && !value.startsWith('#')) {
-                        return 'Link must start with "https://", "/" for internal pages, or "#" for section links'
-                      }
-                      return true
-                    }),
-                  ],
-                }),
-              ],
-              preview: {
-                select: {
-                  title: 'text',
-                  subtitle: 'href',
-                },
-                prepare({ title, subtitle }) {
-                  return {
-                    title,
-                    subtitle,
-                    media: () => '🔗',
-                  }
-                },
-              },
-            },
-          ],
-        }),
       ],
     }),
     defineField({

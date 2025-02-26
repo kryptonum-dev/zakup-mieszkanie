@@ -1,8 +1,8 @@
 export const prerender = true
 
-import { DOMAIN } from '@/global/constants'
-import sanityFetch from '@/utils/sanity.fetch'
 import type { APIRoute } from 'astro'
+import { DOMAIN } from '@global/constants'
+import sanityFetch from '@utils/sanity.fetch'
 
 const slugs = [
   ...(await sanityFetch<string[]>({

@@ -1,10 +1,8 @@
 ---
-import type { ComponentsProps } from '../components/Components.astro'
-import { Components_Query } from '../components/Components.astro'
-import sanityFetch from '../utils/sanity.fetch'
-import metadataFetch from '../utils/metadata.fetch'
-import Layout from '../layouts/Layout.astro'
-import Components from '../components/Components.astro'
+import Layout from '@layout/Layout.astro'
+import sanityFetch from '@utils/sanity.fetch'
+import metadataFetch from '@utils/metadata.fetch'
+import Components, { Components_Query, type ComponentsProps } from '@components/Components.astro'
 
 const page = await sanityFetch<{
   name: string

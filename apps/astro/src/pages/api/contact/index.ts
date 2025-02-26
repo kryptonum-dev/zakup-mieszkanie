@@ -1,10 +1,10 @@
-export const prerender = false
-
-import { REGEX, RESEND_API_KEY } from '@/global/constants'
-import { generateEventIdentifiers } from '@/utils/event-identifiers'
-import { htmlToString } from '@/utils/html-to-string'
 import type { APIRoute } from 'astro'
+import { REGEX } from '@global/constants'
+import { generateEventIdentifiers } from '@utils/event-identifiers'
+import { htmlToString } from '@utils/html-to-string'
 import type { Props } from './sendContactEmail'
+
+const RESEND_API_KEY: string = process.env.RESEND_API_KEY || import.meta.env.RESEND_API_KEY
 
 export const POST: APIRoute = async ({ request }) => {
   const { name, email, message, legal, slug } = (await request.json()) as Props
@@ -14,8 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         message: 'Missing required fields',
         success: false,
-      }),
-      { status: 400 }
+      }), { status: 400 }
     )
   }
 
@@ -25,7 +24,6 @@ export const POST: APIRoute = async ({ request }) => {
     <br />
     <p>${message.trim().replace(/\n/g, '<br />')}</p>
   `
-  const textTemplate = htmlToString(htmlTemplate)
 
   try {
     const res = await fetch(`https://api.resend.com/emails`, {
@@ -38,9 +36,9 @@ export const POST: APIRoute = async ({ request }) => {
         from: 'Formularz kontaktowy Zakup Mieszkanie <formularz@sending.zakupmieszkanie.pl>',
         to: 'admin@zakupmieszkanie.pl',
         reply_to: email,
-        subject: `Wiadomość z formularza kontaktowego Zakup Mieszkanie`,
+        subject: 'Wiadomość z formularza kontaktowego Zakup Mieszkanie',
         html: htmlTemplate,
-        text: textTemplate,
+        text: htmlToString(htmlTemplate),
       }),
     })
 
@@ -49,19 +47,17 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           message: 'Something went wrong',
           success: false,
-        }),
-        { status: 400 }
+        }), { status: 400 }
       )
     }
 
     const userConfirmationTemplate = `
-      <p>Witaj ${email},</p>
+      <p>Witaj ${name},</p>
       <p>Dziękujemy za skontaktowanie się z Zakup Mieszkanie. Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.</p>
       <br />
       <p>Z poważaniem,</p>
       <p>Zespół Zakup Mieszkanie</p>
     `
-    const userConfirmationText = htmlToString(userConfirmationTemplate)
 
     const userRes = await fetch(`https://api.resend.com/emails`, {
       method: 'POST',
@@ -74,7 +70,7 @@ export const POST: APIRoute = async ({ request }) => {
         to: email,
         subject: `Dziękujemy za kontakt z Zakup Mieszkanie`,
         html: userConfirmationTemplate,
-        text: userConfirmationText,
+        text: htmlToString(userConfirmationTemplate),
       }),
     })
 
@@ -83,8 +79,7 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           message: 'Failed to send confirmation email to user',
           success: false,
-        }),
-        { status: 400 }
+        }), { status: 400 }
       )
     }
 
@@ -101,7 +96,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     try {
-      const response = await fetch('/api/meta-conversions', {
+      const response = await fetch('/api/meta-conversion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(conversionData),
@@ -119,16 +114,14 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         message: 'Successfully sent message and confirmation email',
         success: true,
-      }),
-      { status: 200 }
+      }), { status: 200 }
     )
   } catch (error) {
     return new Response(
       JSON.stringify({
         message: 'An error occurred while sending message',
         success: false,
-      }),
-      { status: 400 }
+      }), { status: 400 }
     )
   }
 }

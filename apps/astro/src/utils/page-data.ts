@@ -1,5 +1,5 @@
-import { DOMAIN } from '@/global/constants'
-import sanityFetch from './sanity.fetch'
+import { DOMAIN } from '@global/constants'
+import sanityFetch from '@utils/sanity.fetch'
 
 export type GlobalAnalytics = {
   metaPixelId: string | null
@@ -104,7 +104,7 @@ export async function getPageAdditionalData(slug: string): Promise<PageAdditiona
     ]
     const eventDay = days[now.getDay()]
     const eventMonth = months[now.getMonth()]
-    const fullUrl = `https://${DOMAIN}/${pageData.slug}`
+    const fullUrl = `${DOMAIN}/${pageData.slug}`
 
     return {
       user_role: 'guest',
