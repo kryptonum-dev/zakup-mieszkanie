@@ -39,7 +39,7 @@ const { index, sectionId, heading, features } = Astro.props
       features.map(({ heading, paragraph, icon }) => (
         <li class="feature">
           <Fragment set:html={imageToInlineSvg(icon.asset.url)} />
-          <PortableText value={heading} heading={index === 0 ? 'h3' : 'h4'} class="h3" />
+          <PortableText value={heading} heading={index === 0 ? 'h2' : 'h3'} class="h3" />
           <PortableText value={paragraph} />
         </li>
       ))
