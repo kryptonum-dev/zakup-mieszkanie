@@ -1,13 +1,11 @@
+import type { ComponentProps } from 'astro/types'
+import Head from '@layout/Head.astro'
 import sanityFetch from './sanity.fetch'
 
-type HeadProps = ({ path: string; url?: never } | { url: string; path?: never }) & {
-  title: string
-  description: string
-  openGraphImage?: string
-}
+type Props = ComponentProps<typeof Head>
 
-export default async function metadataFetch(slug: string): Promise<HeadProps> {
-  const seo = await sanityFetch<HeadProps>({
+export default async function metadataFetch(slug: string): Promise<Props> {
+  const seo = await sanityFetch<Props>({
     query: /* groq */ `
       *[slug.current == $slug][0] {
         "path": slug.current,

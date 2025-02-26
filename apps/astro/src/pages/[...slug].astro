@@ -19,6 +19,6 @@ if (!page) return Astro.rewrite('/404')
 const metadata = await metadataFetch(slug)
 ---
 
-<Layout {...metadata} slug={slug}>
+<Layout {...metadata}>
   <Components data={page.components} />
 </Layout>
