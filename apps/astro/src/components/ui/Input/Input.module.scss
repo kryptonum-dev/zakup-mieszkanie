@@ -1,0 +1,41 @@
+.Input {
+  font-size: 0.875rem;
+  .label {
+    margin-bottom: 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+  input,
+  textarea {
+    border: 1px solid var(--primary-500, #683c14);
+    background-color: var(--primary-100, #f2ede8);
+    font-size: 1rem;
+    padding: 0.62rem 1rem;
+    width: 100%;
+    transition: border-color 500ms var(--easing);
+    &:hover {
+      border-color: var(--primary-600, #341e0a);
+    }
+    &:focus-visible {
+      outline: none;
+      border-color: var(--primary-600, #341e0a);
+    }
+    &::placeholder {
+      color: var(--primary-600, #341e0a);
+    }
+    &[aria-invalid='true'] {
+      border-color: var(--error-400, #c8452e);
+    }
+  }
+  input {
+    height: 2.75rem;
+  }
+  textarea {
+    min-height: 6rem;
+    max-height: 12rem;
+    resize: none;
+  }
+}

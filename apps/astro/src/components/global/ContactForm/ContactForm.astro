@@ -1,0 +1,199 @@
+---
+import PortableText, { PortableTextQuery, type PortableTextValue } from '@components/ui/portable-text'
+import Loader from '@components/ui/Loader.astro'
+import Form from './Form'
+import sanityFetch from '@utils/sanity.fetch'
+
+type Props = {
+  index: number
+  sectionId?: string
+  label: string
+  heading: PortableTextValue
+  paragraph: PortableTextValue
+  formStates: {
+    success: {
+      heading: PortableTextValue
+      paragraph: PortableTextValue
+    }
+    error: {
+      heading: PortableTextValue
+      paragraph: PortableTextValue
+    }
+  }
+}
+
+export const ContactForm_Query = `
+  _type == "ContactForm" => {
+    label,
+    ${PortableTextQuery('heading')}
+    ${PortableTextQuery('paragraph')}
+    formStates {
+      success {
+        ${PortableTextQuery('heading')}
+        ${PortableTextQuery('paragraph')}
+      },
+      error {
+        ${PortableTextQuery('heading')}
+        ${PortableTextQuery('paragraph')}
+      }
+    }
+  },
+`
+
+const { index, sectionId, label, heading, paragraph, formStates } = Astro.props
+
+const slug = Astro.params.slug || ''
+
+const data = await sanityFetch<{
+  email: string
+  tel?: string
+}>({
+  query: `
+    {
+      "email": coalesce(*[_type == "page" && slug.current == $slug][0].localSettings.email, *[_type == "global"][0].email),
+      "tel": coalesce(*[_type == "page" && slug.current == $slug][0].localSettings.tel, *[_type == "global"][0].tel),
+    }
+  `,
+  params: { slug: `/${slug}` },
+})
+
+const Label = index === 0 ? 'h2' : 'h3'
+---
+
+<section class="ContactForm" id={sectionId}>
+  <header>
+    <Label class="heading-label">{label}</Label>
+    <PortableText value={heading} heading={index === 0 ? 'h1' : 'h2'} />
+    <PortableText value={paragraph} class="paragraph" />
+  </header>
+  <Form client:load>
+    <Loader class="Loader" />
+    <div class="SuccessState">
+      <svg xmlns="http://www.w3.org/2000/svg" width={40} height={40} viewBox="0 0 40 40" fill="none">
+        <rect width={40} height={40} fill="#118A3B" rx={20}></rect>
+        <path
+          stroke="#FFFEFD"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="m26.4 15.2-9.546 9.6-3.254-3.272">
+        </path>
+      </svg>
+      <PortableText value={formStates.success.heading} class="h3 heading" />
+      <PortableText value={formStates.success.paragraph} class="paragraph" />
+    </div>
+    <div class="ErrorState">
+      <svg xmlns="http://www.w3.org/2000/svg" width={40} height={40} viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" fill="#B65648" rx="20"></rect>
+        <path
+          stroke="#FFFEFD"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M28 12L12 28m16 0L12 12">
+        </path>
+      </svg>
+      <PortableText value={formStates.error.heading} class="h3 heading" />
+      <PortableText value={formStates.error.paragraph} class="paragraph" />
+      <div class="contact-info">
+        <div class="email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" fill="none" viewBox="0 0 25 24">
+            <path
+              fill="#000"
+              d="M20.5 4h-16c-1.103 0-2 .897-2 2v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2Zm0 2v.511l-8 6.223-8-6.222V6h16Zm-16 12V9.044l7.386 5.745a.994.994 0 0 0 1.228 0L20.5 9.044 20.502 18H4.5Z">
+            </path>
+          </svg>
+          <div>
+            <p class="h4">Email</p>
+            <a href={`mailto:${data.email}`} class="link">{data.email}</a>
+          </div>
+        </div>
+        {
+          data.tel && (
+            <div class="tel">
+              <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" fill="none" viewBox="0 0 25 24">
+                <path
+                  fill="#000"
+                  d="M18.207 12.293a.998.998 0 0 0-1.414 0L15.2 13.887c-.739-.22-2.118-.72-2.992-1.594-.874-.874-1.374-2.253-1.594-2.992l1.594-1.594a1 1 0 0 0 0-1.414l-4-4a.999.999 0 0 0-1.414 0L4.081 5.005c-.38.38-.594.902-.586 1.435.023 1.424.4 6.37 4.298 10.268 3.898 3.898 8.844 4.274 10.27 4.298h.027c.528 0 1.027-.208 1.405-.586l2.712-2.712a1 1 0 0 0 0-1.414l-4-4.001Zm-.127 6.712c-1.248-.021-5.518-.356-8.873-3.712-3.366-3.366-3.692-7.651-3.712-8.874L7.5 4.414 10.086 7 8.793 8.293a1 1 0 0 0-.272.912c.024.115.611 2.842 2.271 4.502 1.66 1.66 4.387 2.247 4.502 2.271a.992.992 0 0 0 .912-.271l1.294-1.293L20.086 17l-2.006 2.005Z"
+                />
+              </svg>
+              <div>
+                <p class="h4">Telefon</p>
+                <a href={`tel:${data.tel}`} class="link">
+                  {data.tel}
+                </a>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </Form>
+
+  <style lang="scss">
+    .ContactForm {
+      padding: clamp(4rem, calc(5vw / 0.48), 7rem) 0;
+      header {
+        max-width: 48rem;
+        margin: 0 auto clamp(2rem, calc(3vw / 0.48), 3rem);
+        text-align: center;
+        .paragraph {
+          margin-top: clamp(0.75rem, calc(1vw / 0.48), 1rem);
+        }
+      }
+      :global(form) {
+        position: relative;
+        margin: 0 auto;
+        .Loader,
+        .ErrorState,
+        .SuccessState {
+          display: none;
+        }
+        .SuccessState,
+        .ErrorState {
+          .heading {
+            margin: 0.5rem 0 1rem;
+          }
+        }
+        .ErrorState {
+          .contact-info {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            .email,
+            .tel {
+              display: grid;
+              grid-template-columns: auto 1fr;
+              gap: 1rem;
+              a {
+                display: inline-block;
+                margin-top: 0.5rem;
+              }
+            }
+          }
+        }
+        &[data-status='loading'] {
+          .Loader {
+            display: grid;
+          }
+        }
+        &[data-status='success'] {
+          .SuccessState {
+            display: block;
+          }
+        }
+        &[data-status='error'] {
+          .ErrorState {
+            display: block;
+          }
+        }
+        &[data-status='success'],
+        &[data-status='error'] {
+          :global(> *:not(astro-slot)) {
+            display: none;
+          }
+        }
+      }
+    }
+  </style>
+</section>
