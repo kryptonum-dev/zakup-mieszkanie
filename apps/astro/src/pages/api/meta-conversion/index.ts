@@ -88,7 +88,7 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const advancedMatchingConsent = consentSettings.advanced_matching
+    const advancedMatchingConsent = consentSettings.advanced_matching || 'denied'
 
     const client_ip_address = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
     const client_user_agent = request.headers.get('user-agent')
@@ -125,7 +125,7 @@ export const POST: APIRoute = async ({ request }) => {
               },
               custom_data: {
                 content_name: contentName,
-                advanced_matching_consent: advancedMatchingConsent || 'denied',
+                advanced_matching_consent: advancedMatchingConsent,
                 ...additionalData,
                 ...additionalCustomData,
               },

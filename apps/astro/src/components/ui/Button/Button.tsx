@@ -4,7 +4,7 @@ export type Props = {
   text?: string | React.ReactNode
   children: React.ReactNode
   theme?: 'primary' | 'secondary'
-  linkType?: 'external' | 'internal'
+  linkType?: 'external' | 'internal' | 'anchor'
   href?: string
   className?: string
 } & React.HTMLAttributes<HTMLAnchorElement> & React.ButtonHTMLAttributes<HTMLButtonElement>;

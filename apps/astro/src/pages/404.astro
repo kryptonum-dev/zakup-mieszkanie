@@ -3,6 +3,7 @@ import Layout from '@layout/Layout.astro'
 import sanityFetch from '@utils/sanity.fetch'
 import metadataFetch from '@utils/metadata.fetch'
 import Components, { Components_Query, type ComponentsProps } from '@components/Components.astro'
+import Breadcrumbs from '@components/ui/Breadcrumbs.astro'
 
 const page = await sanityFetch<{
   name: string
@@ -21,7 +22,7 @@ const page = await sanityFetch<{
 const metadata = await metadataFetch(page.slug)
 ---
 
-<Layout {...metadata}>
-  <h1>Not Found Page</h1>
+<Layout {...metadata} hideHeader>
+  <Breadcrumbs data={[{ name: page.name, path: page.slug }]} />
   <Components data={page.components} />
 </Layout>

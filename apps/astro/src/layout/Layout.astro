@@ -9,9 +9,11 @@ import CookieConsent from '@layout/CookieConsent.astro'
 import Header from '@layout/Header.astro'
 import Footer from '@layout/Footer.astro'
 
-type Props = ComponentProps<typeof Head>
+type Props = ComponentProps<typeof Head> & {
+  hideHeader?: boolean
+}
 
-const { ...props } = Astro.props
+const { hideHeader, ...props } = Astro.props
 ---
 
 <!doctype html>
@@ -24,7 +26,7 @@ const { ...props } = Astro.props
   </head>
   <body>
     <CookieConsent />
-    <Header />
+    {!hideHeader && <Header />}
     <main id="main">
       <slot />
     </main>

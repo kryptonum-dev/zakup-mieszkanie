@@ -4,12 +4,13 @@ import { defineSlugForDocument } from '../../utils/define-slug-for-document'
 const name = 'NotFound_Page'
 const title = 'Not Found Page (404)'
 const slug = '/404'
+const icon = () => '🔍';
 
 export default defineType({
   name: name,
   type: 'document',
   title: title,
-  icon: () => '🔍',
+  icon: icon,
   options: { documentPreview: true },
   fields: [
     ...defineSlugForDocument({ slug: slug }),
