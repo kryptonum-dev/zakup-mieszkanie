@@ -18,8 +18,6 @@ export default function Form({ children, ...props }: Props) {
     handleSubmit,
     reset,
     formState: { errors },
-    trigger,
-    setFocus,
   } = useForm({ mode: 'onTouched' });
 
   useEffect(() => {
