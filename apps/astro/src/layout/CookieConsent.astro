@@ -10,6 +10,7 @@ const { analytics, additionalData } = await getPageAnalyticsData(slug)
 const { gtmId, meta, tiktok } = analytics
 const tiktokPixelId = tiktok?.pixelId || null
 const metaPixelId = meta?.pixelId || null
+console.log(tiktokPixelId, metaPixelId)
 
 const groups = [
   {
@@ -276,8 +277,8 @@ const groups = [
       sendConversion(conversionData, 'meta-conversion')
     }
 
-    if (tiktokPixelId && eventName === 'ViewContent') {
-      sendConversion(conversionData, 'tiktok-conversion')
+    if (tiktokPixelId) {
+      sendConversion({ ...conversionData, url: window.location.href, eventSource: 'web' }, 'tiktok-conversion')
     }
   }
 

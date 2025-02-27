@@ -87,36 +87,36 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const { event_id, event_time } = generateEventIdentifiers()
-    const conversionData = {
-      name,
-      email,
-      eventName: 'Lead',
-      eventSource: 'website',
-      contentName: 'Contact Form Submission',
-      slug,
-      event_id,
-      event_time,
-    }
-
-    // Get analytics data to check for pixel IDs
     const { analytics } = await getPageAnalyticsData(slug || '')
 
-    // Send Meta conversion event if Meta Pixel ID exists
     if (analytics.meta?.pixelId) {
       await fetch('/api/meta-conversion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(conversionData),
+        body: JSON.stringify({
+          eventName: 'Lead',
+          email,
+          eventSource: 'website',
+          contentName: 'Contact Form Submission',
+          slug,
+          event_id: generateEventIdentifiers().event_id,
+          event_time: generateEventIdentifiers().event_time,
+        }),
       })
     }
 
-    // Send TikTok conversion event if TikTok Pixel ID exists
     if (analytics.tiktok?.pixelId) {
       await fetch('/api/tiktok-conversion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversionData, event: 'Contact' }),
+        body: JSON.stringify({
+          eventName: 'Contact',
+          email,
+          eventSource: 'web',
+          slug,
+          event_id: generateEventIdentifiers().event_id,
+          event_time: generateEventIdentifiers().event_time,
+        }),
       })
     }
 

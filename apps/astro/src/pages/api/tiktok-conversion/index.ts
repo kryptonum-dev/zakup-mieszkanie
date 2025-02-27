@@ -1,3 +1,4 @@
+import { DOMAIN } from '@global/constants'
 import { hash } from '@utils/hash'
 import { getPageAnalyticsData } from '@utils/page-data'
 import type { APIRoute } from 'astro'
@@ -7,29 +8,16 @@ type UserData = {
   email?: string
   eventName: string
   eventSource: string
-  contentName: string
-  additionalUserData?: Record<string, string>
-  additionalCustomData?: Record<string, any>
   slug?: string
   event_id: string
   event_time: number
+  url: string
 }
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const userData = (await request.json()) as UserData
-    const {
-      name,
-      email,
-      eventName,
-      eventSource,
-      contentName,
-      additionalUserData,
-      additionalCustomData,
-      slug,
-      event_id,
-      event_time,
-    } = userData
+    const { name, email, eventName, eventSource, slug, event_id, event_time } = userData
 
     if (!slug) {
       return new Response(
@@ -41,7 +29,7 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const { analytics, additionalData } = await getPageAnalyticsData(slug)
+    const { analytics } = await getPageAnalyticsData(slug)
 
     if (!analytics.tiktok?.pixelId || !analytics.tiktok?.accessToken) {
       return new Response(
@@ -99,36 +87,25 @@ export const POST: APIRoute = async ({ request }) => {
         'Access-Token': analytics.tiktok.accessToken,
       },
       body: JSON.stringify({
-        pixel_code: analytics.tiktok.pixelId,
-        event: eventName,
-        event_id,
-        timestamp: event_time,
-        context: {
-          page: {
-            url: referer,
-          },
-          user: {
-            ...(name && { name: name }),
-            ...(email && { email: await hash(email) }),
-            external_id: event_id,
-            ip: client_ip_address,
-            user_agent: client_user_agent,
-            ...additionalUserData,
-          },
-          ad: {
-            callback: event_id,
-          },
-        },
-        properties: {
-          contents: [
-            {
-              content_type: contentName,
-              content_id: slug,
+        event_source_id: analytics.tiktok.pixelId,
+        ...(eventSource && { event_source: eventSource }),
+        data: [
+          {
+            event: eventName,
+            event_time,
+            event_id,
+            user: {
+              ...(name && { name: name }),
+              ...(email && { email: await hash(email) }),
+              ip: client_ip_address,
+              user_agent: client_user_agent,
             },
-          ],
-          ...additionalData,
-          ...additionalCustomData,
-        },
+            page: {
+              url: `${DOMAIN}${slug}`,
+              referrer: referer,
+            },
+          },
+        ],
       }),
     })
 
