@@ -218,24 +218,85 @@ export default defineType({
             }),
         }),
         defineField({
-          name: 'metaPixelId',
-          type: 'string',
-          title: 'Meta (Facebook) Pixel ID',
-          description: 'Format: XXXXXXXXXX. Used for Meta Pixel and Conversion API tracking.',
-          validation: (Rule) =>
-            Rule.custom((value) => {
-              if (!value) return true
-              if (!/^\d{15,16}$/.test(value)) {
-                return 'Meta Pixel ID must be a 15-16 digit number'
-              }
-              return true
+          name: 'meta',
+          type: 'object',
+          title: 'Meta (Facebook) Tracking',
+          description: 'Configure Meta Pixel and Conversion API tracking.',
+          options: { collapsible: true },
+          fields: [
+            defineField({
+              name: 'pixelId',
+              type: 'string',
+              title: 'Meta Pixel ID',
+              description: 'Format: XXXXXXXXXX. Used for Meta Pixel and Conversion API tracking.',
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  // @ts-ignore - context.parent is available at runtime
+                  const parent = context.parent as { pixelId?: string; conversionToken?: string }
+
+                  if (!value && !parent.conversionToken) return true
+                  if (!value && parent.conversionToken)
+                    return 'Meta Pixel ID is required when Conversion Token is provided'
+                  if (value && !/^\d{15,16}$/.test(value)) return 'Meta Pixel ID must be a 15-16 digit number'
+                  return true
+                }),
             }),
+            defineField({
+              name: 'conversionToken',
+              type: 'string',
+              title: 'Meta Conversion API Token',
+              description: 'Secret token for server-side Meta Conversion API tracking.',
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  // @ts-ignore - context.parent is available at runtime
+                  const parent = context.parent as { pixelId?: string; conversionToken?: string }
+
+                  if (!value && !parent.pixelId) return true
+                  if (!value && parent.pixelId) return 'Meta Conversion Token is required when Pixel ID is provided'
+                  return true
+                }),
+            }),
+          ],
         }),
         defineField({
-          name: 'metaConversionToken',
-          type: 'string',
-          title: 'Meta Conversion API Token',
-          description: 'Secret token for server-side Meta Conversion API tracking.',
+          name: 'tiktok',
+          type: 'object',
+          title: 'TikTok Tracking',
+          description: 'Configure TikTok Pixel and Conversion API tracking.',
+          options: { collapsible: true },
+          fields: [
+            defineField({
+              name: 'pixelId',
+              type: 'string',
+              title: 'TikTok Pixel ID',
+              description: 'Format: XXXXXXXXXX. Used for TikTok Pixel and Conversion API tracking.',
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  // @ts-ignore - context.parent is available at runtime
+                  const parent = context.parent as { pixelId?: string; accessToken?: string }
+
+                  if (!value && !parent.accessToken) return true
+                  if (!value && parent.accessToken) return 'TikTok Pixel ID is required when Access Token is provided'
+                  if (value && !/^[A-Z0-9]+$/.test(value)) return 'TikTok Pixel ID must be alphanumeric'
+                  return true
+                }),
+            }),
+            defineField({
+              name: 'accessToken',
+              type: 'string',
+              title: 'TikTok Conversion API Token',
+              description: 'Secret token for server-side TikTok Conversion API tracking.',
+              validation: (Rule) =>
+                Rule.custom((value, context) => {
+                  // @ts-ignore - context.parent is available at runtime
+                  const parent = context.parent as { pixelId?: string; accessToken?: string }
+
+                  if (!value && !parent.pixelId) return true
+                  if (!value && parent.pixelId) return 'TikTok Access Token is required when Pixel ID is provided'
+                  return true
+                }),
+            }),
+          ],
         }),
       ],
     }),

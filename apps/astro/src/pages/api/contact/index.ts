@@ -1,7 +1,8 @@
-import type { APIRoute } from 'astro'
 import { REGEX } from '@global/constants'
 import { generateEventIdentifiers } from '@utils/event-identifiers'
 import { htmlToString } from '@utils/html-to-string'
+import { getPageAnalyticsData } from '@utils/page-data'
+import type { APIRoute } from 'astro'
 import type { Props } from './sendContactEmail'
 
 const RESEND_API_KEY: string = process.env.RESEND_API_KEY || import.meta.env.RESEND_API_KEY
@@ -14,7 +15,8 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         message: 'Missing required fields',
         success: false,
-      }), { status: 400 }
+      }),
+      { status: 400 }
     )
   }
 
@@ -47,7 +49,8 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           message: 'Something went wrong',
           success: false,
-        }), { status: 400 }
+        }),
+        { status: 400 }
       )
     }
 
@@ -79,7 +82,8 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           message: 'Failed to send confirmation email to user',
           success: false,
-        }), { status: 400 }
+        }),
+        { status: 400 }
       )
     }
 
@@ -95,33 +99,41 @@ export const POST: APIRoute = async ({ request }) => {
       event_time,
     }
 
-    try {
-      const response = await fetch('/api/meta-conversion', {
+    // Get analytics data to check for pixel IDs
+    const { analytics } = await getPageAnalyticsData(slug || '')
+
+    // Send Meta conversion event if Meta Pixel ID exists
+    if (analytics.meta?.pixelId) {
+      await fetch('/api/meta-conversion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(conversionData),
       })
+    }
 
-      if (!response.ok) {
-        const data = await response.json()
-        console.warn('Meta conversion event failed:', data.message)
-      }
-    } catch (error) {
-      console.warn('Failed to send Meta conversion event:', error)
+    // Send TikTok conversion event if TikTok Pixel ID exists
+    if (analytics.tiktok?.pixelId) {
+      await fetch('/api/tiktok-conversion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversionData, event: 'Contact' }),
+      })
     }
 
     return new Response(
       JSON.stringify({
         message: 'Successfully sent message and confirmation email',
         success: true,
-      }), { status: 200 }
+      }),
+      { status: 200 }
     )
   } catch (error) {
     return new Response(
       JSON.stringify({
         message: 'An error occurred while sending message',
         success: false,
-      }), { status: 400 }
+      }),
+      { status: 400 }
     )
   }
 }

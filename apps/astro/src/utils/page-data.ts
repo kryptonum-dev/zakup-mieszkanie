@@ -2,9 +2,15 @@ import { DOMAIN } from '@global/constants'
 import sanityFetch from '@utils/sanity.fetch'
 
 export type GlobalAnalytics = {
-  metaPixelId: string | null
-  metaConversionToken: string | null
   gtmId: string | null
+  meta: {
+    pixelId: string | null
+    conversionToken: string | null
+  } | null
+  tiktok: {
+    pixelId: string | null
+    accessToken: string | null
+  } | null
 }
 
 export type PageAdditionalData = {
@@ -34,26 +40,32 @@ export async function getGlobalAnalytics(): Promise<GlobalAnalytics> {
     }>({
       query: `*[_type == "global"][0]{
         analytics {
-          metaPixelId,
-          metaConversionToken,
-          gtmId
+          gtmId,
+          meta {
+            pixelId,
+            conversionToken
+          },
+          tiktok {
+            pixelId,
+            accessToken
+          }
         }
       }`,
     })
 
     return (
       globalData?.analytics || {
-        metaPixelId: null,
-        metaConversionToken: null,
         gtmId: null,
+        meta: null,
+        tiktok: null,
       }
     )
   } catch (error) {
     console.error('Failed to fetch global analytics data from Sanity:', error)
     return {
-      metaPixelId: null,
-      metaConversionToken: null,
       gtmId: null,
+      meta: null,
+      tiktok: null,
     }
   }
 }

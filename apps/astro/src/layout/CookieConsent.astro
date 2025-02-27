@@ -7,7 +7,9 @@ const slug = Astro.params.slug || ''
 
 const { analytics, additionalData } = await getPageAnalyticsData(slug)
 
-const { gtmId } = analytics
+const { gtmId, meta, tiktok } = analytics
+const tiktokPixelId = tiktok?.pixelId || null
+const metaPixelId = meta?.pixelId || null
 
 const groups = [
   {
@@ -65,8 +67,8 @@ const groups = [
       <div data-header-initial>
         <h2 class="heading">Korzystając ze strony zgadzasz się na użycie ciasteczek</h2>
         <p>
-          Korzystamy z cookie i podobnych technologii, by analizować ruch na stronie, dopasować ją do Ciebie
-          i wyświetlać trafniejsze reklamy. <a href="/polityka-prywatnosci" class="link">Dowiedz się więcej</a>
+          Korzystamy z cookie i podobnych technologii, by analizować ruch na stronie, dopasować ją do Ciebie i
+          wyświetlać trafniejsze reklamy. <a href="/polityka-prywatnosci" class="link">Dowiedz się więcej</a>
         </p>
       </div>
       <div data-header-settings style="display: none">
@@ -214,7 +216,7 @@ const groups = [
   }
 </style>
 
-<script is:inline define:vars={{ gtmId, additionalData }}>
+<script is:inline define:vars={{ gtmId, tiktokPixelId, metaPixelId, additionalData }}>
   window.dataLayer = window.dataLayer || []
   function gtag() {
     window.dataLayer.push(arguments)
@@ -235,14 +237,14 @@ const groups = [
     document.cookie = `${name}=${encodeURIComponent(value)}${expires}; SameSite=Strict`
   }
 
-  async function sendConversion(eventData) {
+  async function sendConversion(eventData, route = 'meta-conversion') {
     const cookieConsent = getCookie('cookie-consent')
     if (!cookieConsent) return
 
     const consentSettings = JSON.parse(decodeURIComponent(cookieConsent))
     if (consentSettings.conversion_api !== 'granted') return
 
-    await fetch('/api/meta-conversion', {
+    await fetch(`/api/${route}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(eventData),
@@ -270,7 +272,13 @@ const groups = [
       slug: window.location.pathname,
     }
 
-    sendConversion(conversionData)
+    if (metaPixelId) {
+      sendConversion(conversionData, 'meta-conversion')
+    }
+
+    if (tiktokPixelId && eventName === 'ViewContent') {
+      sendConversion(conversionData, 'tiktok-conversion')
+    }
   }
 
   function fireInitialEvents() {

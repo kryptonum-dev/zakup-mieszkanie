@@ -43,10 +43,10 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { analytics, additionalData } = await getPageAnalyticsData(slug)
 
-    if (!analytics.meta?.pixelId || !analytics.meta?.conversionToken) {
+    if (!analytics.tiktok?.pixelId || !analytics.tiktok?.accessToken) {
       return new Response(
         JSON.stringify({
-          message: 'Meta analytics credentials not found',
+          message: 'TikTok analytics credentials not found',
           success: false,
         }),
         { status: 400 }
@@ -88,57 +88,54 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const advancedMatchingConsent = consentSettings.advanced_matching || 'denied'
-
     const client_ip_address = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
     const client_user_agent = request.headers.get('user-agent')
     const referer = request.headers.get('referer')
 
-    const fbc = cookies._fbc
-    const fbp = cookies._fbp
-
-    const response = await fetch(
-      `https://graph.facebook.com/v21.0/${analytics.meta.pixelId}/events?access_token=${analytics.meta.conversionToken}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: [
+    const response = await fetch(`https://business-api.tiktok.com/open_api/v1.3/pixel/track/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Token': analytics.tiktok.accessToken,
+      },
+      body: JSON.stringify({
+        pixel_code: analytics.tiktok.pixelId,
+        event: eventName,
+        event_id,
+        timestamp: event_time,
+        context: {
+          page: {
+            url: referer,
+          },
+          user: {
+            ...(name && { name: name }),
+            ...(email && { email: await hash(email) }),
+            external_id: event_id,
+            ip: client_ip_address,
+            user_agent: client_user_agent,
+            ...additionalUserData,
+          },
+          ad: {
+            callback: event_id,
+          },
+        },
+        properties: {
+          contents: [
             {
-              event_id,
-              event_name: eventName,
-              event_time,
-              action_source: eventSource,
-              event_source_url: referer,
-              user_data: {
-                ...(advancedMatchingConsent === 'granted'
-                  ? {
-                      client_ip_address,
-                      client_user_agent,
-                      ...(email && { em: await hash(email) }),
-                      ...(name && { fn: name }),
-                      ...(fbc && { fbc }),
-                      ...(fbp && { fbp }),
-                    }
-                  : {}),
-                ...additionalUserData,
-              },
-              custom_data: {
-                content_name: contentName,
-                advanced_matching_consent: advancedMatchingConsent,
-                ...additionalData,
-                ...additionalCustomData,
-              },
+              content_type: contentName,
+              content_id: slug,
             },
           ],
-        }),
-      }
-    )
+          ...additionalData,
+          ...additionalCustomData,
+        },
+      }),
+    })
 
     if (!response.ok) {
       return new Response(
         JSON.stringify({
-          message: 'Failed to send conversion event',
+          message: 'Failed to send TikTok conversion event',
           success: false,
         }),
         { status: response.status }
@@ -147,16 +144,16 @@ export const POST: APIRoute = async ({ request }) => {
 
     return new Response(
       JSON.stringify({
-        message: 'Successfully sent conversion event',
+        message: 'Successfully sent TikTok conversion event',
         success: true,
       }),
       { status: 200 }
     )
   } catch (error) {
-    console.error('Error in meta-conversion API:', error)
+    console.error('Error in tiktok-conversion API:', error)
     return new Response(
       JSON.stringify({
-        message: 'An error occurred while processing the conversion event',
+        message: 'An error occurred while processing the TikTok conversion event',
         success: false,
       }),
       { status: 500 }
