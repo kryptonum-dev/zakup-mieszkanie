@@ -239,6 +239,7 @@ const groups = [
   }
 
   async function sendConversion(eventData, route = 'meta-conversion') {
+    console.log(eventData)
     const cookieConsent = getCookie('cookie-consent')
     if (!cookieConsent) return
 
@@ -269,7 +270,7 @@ const groups = [
       eventSource: 'website',
       event_id,
       event_time,
-      additionalCustomData: { customData, ...additionalData },
+      additionalCustomData: { ...customData, ...additionalData },
       slug: window.location.pathname,
     }
 
@@ -278,7 +279,14 @@ const groups = [
     }
 
     if (tiktokPixelId) {
-      sendConversion({ ...conversionData, url: window.location.href, eventSource: 'web' }, 'tiktok-conversion')
+      sendConversion(
+        {
+          ...conversionData,
+          url: window.location.href,
+          ...(eventName === 'ViewContent' && { content_id: additionalData?.content_id }),
+        },
+        'tiktok-conversion'
+      )
     }
   }
 

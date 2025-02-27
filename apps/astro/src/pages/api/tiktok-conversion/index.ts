@@ -7,17 +7,17 @@ type UserData = {
   name?: string
   email?: string
   eventName: string
-  eventSource: string
   slug?: string
   event_id: string
   event_time: number
   url: string
+  content_id?: string
 }
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const userData = (await request.json()) as UserData
-    const { name, email, eventName, eventSource, slug, event_id, event_time } = userData
+    const { name, email, eventName, slug, event_id, event_time, content_id } = userData
 
     if (!slug) {
       return new Response(
@@ -88,7 +88,9 @@ export const POST: APIRoute = async ({ request }) => {
       },
       body: JSON.stringify({
         event_source_id: analytics.tiktok.pixelId,
-        ...(eventSource && { event_source: eventSource }),
+        event: eventName,
+        test_event_code: 'TEST66822',
+        pixel_code: analytics.tiktok.pixelId,
         data: [
           {
             event: eventName,
@@ -108,6 +110,10 @@ export const POST: APIRoute = async ({ request }) => {
         ],
       }),
     })
+
+    const res = await response.json()
+
+    console.log(res)
 
     if (!response.ok) {
       return new Response(

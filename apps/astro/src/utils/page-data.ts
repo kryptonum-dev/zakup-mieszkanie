@@ -90,7 +90,7 @@ export async function getPageAdditionalData(slug: string): Promise<PageAdditiona
           description
         }
       }`,
-      params: { slug },
+      params: { slug: slug || '/' },
     })
 
     if (!pageData) return undefined

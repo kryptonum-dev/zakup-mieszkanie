@@ -112,7 +112,6 @@ export const POST: APIRoute = async ({ request }) => {
         body: JSON.stringify({
           eventName: 'Contact',
           email,
-          eventSource: 'web',
           slug,
           event_id: generateEventIdentifiers().event_id,
           event_time: generateEventIdentifiers().event_time,
