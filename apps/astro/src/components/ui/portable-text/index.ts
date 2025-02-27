@@ -1,4 +1,5 @@
 export { default, type PortableTextValue } from './index.astro';
+export { portableTextToHTML } from './portable-text-to-html';
 
 export const PortableTextQuery = (name: string) => `
   ${name}[] {

@@ -1,8 +1,11 @@
 ---
-import PortableText, { PortableTextQuery, type PortableTextValue } from '@components/ui/portable-text'
+import PortableText, {
+  portableTextToHTML,
+  PortableTextQuery,
+  type PortableTextValue,
+} from '@components/ui/portable-text'
 import Button, { ButtonDataQuery, type ButtonDataProps } from '@components/ui/Button'
 import Accordion from '@components/ui/Accordion.astro'
-import { toHTML } from '@utils/to-html'
 
 type Props = {
   index: number
@@ -22,23 +25,13 @@ export const Faq_Query = `
     ${PortableTextQuery('paragraph')}
     ${ButtonDataQuery('cta')}
     faqItems[] {
-      question,
+      ${PortableTextQuery('question')}
       ${PortableTextQuery('answer')}
     }
   },
 `
 
 const { index, sectionId, heading, paragraph, cta, faqItems } = Astro.props
-
-const slug = Astro.url.pathname
-const schemaId = `${slug}#faq`
-
-const schemaItems = await Promise.all(
-  faqItems.map(async ({ question, answer }) => ({
-    question: await toHTML(question),
-    answer: await toHTML(answer),
-  }))
-)
 ---
 
 <section class="Faq" id={sectionId}>
@@ -82,14 +75,16 @@ const schemaItems = await Promise.all(
   set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    '@id': schemaId,
-    mainEntity: schemaItems.map(({ question, answer }) => ({
-      '@type': 'Question',
-      name: question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: answer,
-      },
-    })),
+    '@id': `${Astro.url.pathname}#faq`,
+    mainEntity: await Promise.all(
+      faqItems.map(async ({ question, answer }) => ({
+        '@type': 'Question',
+        name: await portableTextToHTML(question),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: await portableTextToHTML(answer),
+        },
+      }))
+    ),
   })}
 />

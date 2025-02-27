@@ -1,5 +1,5 @@
 import type { PortableTextValue } from '@components/ui/portable-text'
-import sanityFetch from './sanity.fetch'
+import sanityFetch from '@utils/sanity.fetch'
 
 const getInternalSlug = async (ref: string) => {
   const data = await sanityFetch<string>({
@@ -49,25 +49,22 @@ const renderBlock = (style: string, content: string): string => {
     blockquote: ['<blockquote>', '</blockquote>'],
     normal: ['<p>', '</p>'],
   }
-
   const [openTag, closeTag] = blockTags[style] || blockTags.normal
   return `${openTag}${content}${closeTag}`
 }
 
 const handleListTransition = (currentType: string | null, newType: string | null): string => {
   let html = ''
-
   if (currentType && currentType !== newType) {
     html += `</${currentType === 'bullet' ? 'ul' : 'ol'}>`
   }
   if (newType && currentType !== newType) {
     html += `<${newType === 'bullet' ? 'ul' : 'ol'}>`
   }
-
   return html
 }
 
-export const toHTML = async (blocks: PortableTextValue): Promise<string> => {
+export const portableTextToHTML = async (blocks: PortableTextValue): Promise<string> => {
   if (!Array.isArray(blocks)) {
     blocks = [blocks]
   }
