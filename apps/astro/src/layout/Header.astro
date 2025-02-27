@@ -177,6 +177,7 @@ const data = await sanityFetch<HeaderProps>({
   const header = document.querySelector('[data-layout-header]')!
   const menuButton = header.querySelector('.menu-button')!
   const navigation = header.querySelector('#main-navigation')!
+  const navigation_links = navigation.querySelectorAll('a')
   const overlay = document.querySelector('[data-layout-header-overlay]')!
 
   menuButton.addEventListener('click', () => {
@@ -191,6 +192,9 @@ const data = await sanityFetch<HeaderProps>({
     navigation.setAttribute('aria-hidden', 'true')
     menuButton.setAttribute('aria-label', 'Otwórz menu')
   }
+
+  navigation_links.forEach((link) => link.addEventListener('click', closeMenu))
+
   overlay.addEventListener('click', closeMenu)
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeMenu()
