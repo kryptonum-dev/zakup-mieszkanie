@@ -30,7 +30,7 @@ export const Faq_Query = `
 
 const { index, sectionId, heading, paragraph, cta, faqItems } = Astro.props
 
-const slug = Astro.params.slug || ''
+const slug = Astro.url.pathname
 const schemaId = `${slug}#faq`
 
 const schemaItems = await Promise.all(
