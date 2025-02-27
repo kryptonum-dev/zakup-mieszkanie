@@ -2,6 +2,7 @@
 import PortableText, { PortableTextQuery, type PortableTextValue } from '@components/ui/portable-text'
 import Button, { ButtonDataQuery, type ButtonDataProps } from '@components/ui/Button'
 import Accordion from '@components/ui/Accordion.astro'
+import { toHTML } from '@utils/to-html'
 
 type Props = {
   index: number
@@ -28,6 +29,16 @@ export const Faq_Query = `
 `
 
 const { index, sectionId, heading, paragraph, cta, faqItems } = Astro.props
+
+const slug = Astro.params.slug || ''
+const schemaId = `${slug}#faq`
+
+const schemaItems = await Promise.all(
+  faqItems.map(async ({ question, answer }) => ({
+    question: await toHTML(question),
+    answer: await toHTML(answer),
+  }))
+)
 ---
 
 <section class="Faq" id={sectionId}>
@@ -64,3 +75,21 @@ const { index, sectionId, heading, paragraph, cta, faqItems } = Astro.props
     }
   }
 </style>
+
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': schemaId,
+    mainEntity: schemaItems.map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: answer,
+      },
+    })),
+  })}
+/>
