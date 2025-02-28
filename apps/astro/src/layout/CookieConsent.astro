@@ -10,7 +10,6 @@ const { analytics, additionalData } = await getPageAnalyticsData(slug)
 const { gtmId, meta, tiktok } = analytics
 const tiktokPixelId = tiktok?.pixelId || null
 const metaPixelId = meta?.pixelId || null
-console.log(tiktokPixelId, metaPixelId)
 
 const groups = [
   {
@@ -239,7 +238,6 @@ const groups = [
   }
 
   async function sendConversion(eventData, route = 'meta-conversion') {
-    console.log(eventData)
     const cookieConsent = getCookie('cookie-consent')
     if (!cookieConsent) return
 

@@ -75,7 +75,6 @@ export const POST: APIRoute = async ({ request }) => {
         { status: 400 }
       )
     }
-
     const client_ip_address = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
     const client_user_agent = request.headers.get('user-agent')
     const referer = request.headers.get('referer')
@@ -89,7 +88,6 @@ export const POST: APIRoute = async ({ request }) => {
       body: JSON.stringify({
         event_source_id: analytics.tiktok.pixelId,
         event: eventName,
-        test_event_code: 'TEST66822',
         pixel_code: analytics.tiktok.pixelId,
         data: [
           {
@@ -112,7 +110,6 @@ export const POST: APIRoute = async ({ request }) => {
     })
 
     const res = await response.json()
-
     console.log(res)
 
     if (!response.ok) {
