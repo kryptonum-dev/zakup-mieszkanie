@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'preact/hooks';
-import { useForm, type FieldValues } from 'react-hook-form';
+import { useForm, type FieldValues, type SubmitHandler } from 'react-hook-form';
 import styles from './Form.module.scss';
 import Input from '@components/ui/Input'
 import Checkbox from '@components/ui/Checkbox'
 import Button from '@components/ui/Button'
 import { REGEX } from '@global/constants';
 import { sendContactEmail, type Props as sendContactEmailProps } from '@api/contact/sendContactEmail';
+import { trackEvent } from '@api/analytics/track-event';
 
 type Props = {
   children: React.ReactNode,
@@ -26,46 +27,47 @@ export default function Form({ children, ...props }: Props) {
     return () => document.removeEventListener('Contact-TryAgain', tryAgain);
   }, []);
 
-  const onSubmit = async (data: FieldValues) => {
+  const onSubmit = async (data: sendContactEmailProps) => {
     setStatus('loading');
     const response = await sendContactEmail(data as sendContactEmailProps);
     if (response.success) {
       setStatus('success');
       reset();
+      trackEvent({
+        user_data: {
+          phone: data.phone,
+        },
+        meta: {
+          event_name: 'Lead',
+        },
+        ga: {
+          event_name: 'generate_lead',
+          params: {},
+        },
+      })
     } else {
       setStatus('error')
     }
   };
 
   return (
-    <form {...props} onSubmit={handleSubmit(onSubmit)} data-status={status}>
-      <div className={styles.column}>
-        <Input
-          label='Imię'
-          register={register('name', {
-            required: { value: true, message: 'Imię jest wymagane' },
-          })}
-          errors={errors}
-          type='text'
-        />
-        <Input
-          label='Email'
-          register={register('email', {
-            required: { value: true, message: 'Email jest wymagany' },
-            pattern: { value: REGEX.email, message: 'Niepoprawny adres e-mail' },
-          })}
-          errors={errors}
-          type='email'
-        />
-      </div>
+    <form {...props} onSubmit={handleSubmit(onSubmit as SubmitHandler<FieldValues>)} data-status={status}>
       <Input
-        label='Temat rozmowy'
-        register={register('message', {
-          required: { value: true, message: 'Temat jest wymagany' },
+        label='Imię'
+        register={register('name', {
+          required: { value: true, message: 'Imię jest wymagane' },
         })}
-        isTextarea={true}
         errors={errors}
-        placeholder='Daj znać, o czym porozmawiamy'
+        type='text'
+      />
+      <Input
+        label='Numer telefonu'
+        register={register('phone', {
+          required: { value: true, message: 'Numer telefonu jest wymagany' },
+          pattern: { value: REGEX.phone, message: 'Niepoprawny numer telefonu' },
+        })}
+        errors={errors}
+        type='tel'
       />
       <Checkbox
         register={register('legal', {

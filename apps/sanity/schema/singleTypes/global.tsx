@@ -22,6 +22,36 @@ export default defineType({
       group: 'contact',
     }),
     defineField({
+      name: 'phoneWidget',
+      type: 'object',
+      title: 'Floating Phone Widget',
+      group: 'contact',
+      options: { collapsible: true },
+      fields: [
+        defineField({
+          name: 'phoneNumber',
+          type: 'string',
+          title: 'Phone Number',
+          description: 'Phone number for the floating widget (e.g., +48123456789)',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'tooltipText',
+          type: 'string',
+          title: 'Tooltip Text',
+          description: 'Text shown on hover (e.g., "Skontaktuj się z ekspertem Krzysztofem Iwanem")',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'avatar',
+          type: 'image',
+          title: 'Avatar Image',
+          description: 'Small circular image for the widget',
+          validation: (Rule) => Rule.required(),
+        }),
+      ],
+    }),
+    defineField({
       name: 'socials',
       type: 'object',
       title: 'Social media',
@@ -200,39 +230,27 @@ export default defineType({
       type: 'object',
       group: 'analytics',
       options: { collapsible: true },
-      description:
-        'Configure analytics tracking tools to monitor page performance and user behavior. Leave fields empty to disable tracking.',
       fields: [
         defineField({
-          name: 'gtmId',
+          name: 'gtm_id',
           type: 'string',
           title: 'Google Tag Manager ID',
           description: 'Format: GTM-XXXXXX. Container ID for managing analytics tools (GA4, Facebook Pixel, etc.).',
-          validation: (Rule) =>
-            Rule.custom((value) => {
-              if (!value) return true
-              if (!/^GTM-[A-Z0-9]{6,}$/.test(value)) {
-                return 'GTM ID must be in format GTM-XXXXXX'
-              }
-              return true
-            }),
         }),
         defineField({
-          name: 'metaPixelId',
+          name: 'ga4_id',
+          type: 'string',
+          title: 'Google Analytics 4 ID',
+          description: 'Format: G-XXXXXXXXXX. Used for GA4 tracking.',
+        }),
+        defineField({
+          name: 'meta_pixel_id',
           type: 'string',
           title: 'Meta (Facebook) Pixel ID',
           description: 'Format: XXXXXXXXXX. Used for Meta Pixel and Conversion API tracking.',
-          validation: (Rule) =>
-            Rule.custom((value) => {
-              if (!value) return true
-              if (!/^\d{15,16}$/.test(value)) {
-                return 'Meta Pixel ID must be a 15-16 digit number'
-              }
-              return true
-            }),
         }),
         defineField({
-          name: 'metaConversionToken',
+          name: 'meta_conversion_token',
           type: 'string',
           title: 'Meta Conversion API Token',
           description: 'Secret token for server-side Meta Conversion API tracking.',

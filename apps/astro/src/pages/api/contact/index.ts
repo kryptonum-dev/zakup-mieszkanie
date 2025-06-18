@@ -1,15 +1,14 @@
 import type { APIRoute } from 'astro'
 import { REGEX } from '@global/constants'
-import { generateEventIdentifiers } from '@utils/event-identifiers'
 import { htmlToString } from '@utils/html-to-string'
 import type { Props } from './sendContactEmail'
 
 const RESEND_API_KEY: string = process.env.RESEND_API_KEY || import.meta.env.RESEND_API_KEY
 
 export const POST: APIRoute = async ({ request }) => {
-  const { name, email, message, legal, slug } = (await request.json()) as Props
+  const { name, phone, legal } = (await request.json()) as Props
 
-  if (!REGEX.email.test(email) || !message || !legal || !name) {
+  if (!REGEX.phone.test(phone) || !legal || !name) {
     return new Response(
       JSON.stringify({
         message: 'Missing required fields',
@@ -20,9 +19,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const htmlTemplate = `
     <p>Imię: <b>${name}</b></p>
-    <p>Adres email: <b>${email}</b></p>
-    <br />
-    <p>${message.trim().replace(/\n/g, '<br />')}</p>
+    <p>Numer telefonu: <b>${phone}</b></p>
   `
 
   try {
@@ -35,8 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
       body: JSON.stringify({
         from: 'Formularz kontaktowy Zakup Mieszkanie <formularz@sending.zakupmieszkanie.pl>',
         to: 'admin@zakupmieszkanie.pl',
-        reply_to: email,
-        subject: 'Wiadomość z formularza kontaktowego Zakup Mieszkanie',
+        subject: '⭐️ Nowy kontakt z formularza kontaktowego',
         html: htmlTemplate,
         text: htmlToString(htmlTemplate),
       }),
@@ -51,68 +47,9 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const userConfirmationTemplate = `
-      <p>Witaj ${name},</p>
-      <p>Dziękujemy za skontaktowanie się z Zakup Mieszkanie. Otrzymaliśmy Twoją wiadomość i wkrótce się z Tobą skontaktujemy.</p>
-      <br />
-      <p>Z poważaniem,</p>
-      <p>Zespół Zakup Mieszkanie</p>
-    `
-
-    const userRes = await fetch(`https://api.resend.com/emails`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: 'Formularz kontaktowy Zakup Mieszkanie <formularz@sending.zakupmieszkanie.pl>',
-        to: email,
-        subject: `Dziękujemy za kontakt z Zakup Mieszkanie`,
-        html: userConfirmationTemplate,
-        text: htmlToString(userConfirmationTemplate),
-      }),
-    })
-
-    if (userRes.status !== 200) {
-      return new Response(
-        JSON.stringify({
-          message: 'Failed to send confirmation email to user',
-          success: false,
-        }), { status: 400 }
-      )
-    }
-
-    const { event_id, event_time } = generateEventIdentifiers()
-    const conversionData = {
-      name,
-      email,
-      eventName: 'Lead',
-      eventSource: 'website',
-      contentName: 'Contact Form Submission',
-      slug,
-      event_id,
-      event_time,
-    }
-
-    try {
-      const response = await fetch('/api/meta-conversion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(conversionData),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        console.warn('Meta conversion event failed:', data.message)
-      }
-    } catch (error) {
-      console.warn('Failed to send Meta conversion event:', error)
-    }
-
     return new Response(
       JSON.stringify({
-        message: 'Successfully sent message and confirmation email',
+        message: 'Successfully sent message',
         success: true,
       }), { status: 200 }
     )

@@ -8,7 +8,7 @@ import { DOMAIN } from '@global/constants'
       <p class="copyright">© {new Date().getFullYear()} {DOMAIN.replace('https://', '')}. Wszelkie prawa zastrzeżone.</p>
       <div class="legal">
         <a href="/polityka-prywatnosci" class="link">Polityka prywatności</a>
-        <button class="link reset-cookies">Ustawienia plików cookies</button>
+        <button class="link" id="reset-cookie-consent">Ustawienia plików cookies</button>
       </div>
     </div>
     <p class="attribution">
@@ -103,17 +103,3 @@ import { DOMAIN } from '@global/constants'
     }
   }
 </style>
-
-<script>
-  import { setCookie } from '@utils/set-cookie'
-
-  const footer = document.querySelector('[data-layout-footer]')!
-  footer.querySelector('.reset-cookies')!.addEventListener('click', () => {
-    document.cookie.split(';').forEach((cookie) => {
-      const eqPos = cookie.indexOf('=')
-      const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie
-      setCookie(name, '', -1)
-    })
-    window.location.reload()
-  })
-</script>

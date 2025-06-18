@@ -6,9 +6,10 @@ type Props = {
     name: string
     path: string
   }>
+  isHidden?: boolean
 }
 
-const { data = [] } = Astro.props
+const { data = [], isHidden = false } = Astro.props
 
 const breadcrumbsData = [
   ...(data[0].path !== '/' ? [{ name: 'Strona główna', path: '/' }] : []),
@@ -28,7 +29,7 @@ const schema = JSON.stringify({
 ---
 
 <script is:inline type="application/ld+json" set:html={schema} />
-{breadcrumbsData.length >= 2 && (
+{(breadcrumbsData.length >= 2 && !isHidden) && (
   <nav class="Breadcrumbs">
     {breadcrumbsData.map(({ name, path }, i) => {
       const isLastItem = i === breadcrumbsData.length - 1

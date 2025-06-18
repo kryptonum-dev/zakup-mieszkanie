@@ -27,6 +27,27 @@ const metadata = await metadataFetch(slug)
 ---
 
 <Layout {...metadata}>
-  <Breadcrumbs data={[{ name: page.name, path: page.slug }]} />
+  <Breadcrumbs data={[{ name: page.name, path: page.slug }]} isHidden={true} />
   <Components data={page.components} />
 </Layout>
+
+<script is:inline>
+  window.pageData = { title: document.title }
+</script>
+
+<script>
+  import { trackEvent } from '@api/analytics/track-event'
+
+  document.addEventListener('DOMContentLoaded', () => {
+    trackEvent({
+      meta: {
+        event_name: 'ViewContent',
+        content_name: window.pageData.title,
+      },
+      ga: {
+        event_name: 'view_item',
+        params: {},
+      },
+    })
+  })
+</script>
