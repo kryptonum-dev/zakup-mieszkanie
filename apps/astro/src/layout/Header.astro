@@ -1,6 +1,6 @@
 ---
 import sanityFetch from '@utils/sanity.fetch'
-import Button, { type ButtonDataProps } from '@components/ui/Button'
+import Button, { ButtonDataQuery, type ButtonDataProps } from '@components/ui/Button'
 
 const { slug: _slug = '' } = Astro.params
 const slug = `/${_slug || ''}`
@@ -20,11 +20,7 @@ const data = await sanityFetch<HeaderProps>({
         text,
         href
       },
-      cta {
-        text,
-        href,
-        theme
-      }
+      ${ButtonDataQuery('cta')}
     }
   `,
   params: { slug: slug },
@@ -51,7 +47,7 @@ const data = await sanityFetch<HeaderProps>({
         }
       </ul>
     </nav>
-    <a href="/" class="logo" aria-label="Strona główna">
+    <a href="#" class="logo" aria-label="Strona główna">
       <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" viewBox="0 0 512 512">
         <path fill="#E6DBD1" d="M0 0h512v512H0z"></path><path
           stroke="#341E0A"

@@ -17,6 +17,7 @@ const page = await sanityFetch<{
       ${Components_Query}
     }
   `,
+  params: { slug: '/404' },
 })
 
 const metadata = await metadataFetch(page.slug)
