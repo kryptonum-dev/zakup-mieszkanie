@@ -7,6 +7,7 @@ import OrganizationSchema from '@schema/OrganizationSchema.astro'
 import CookieConsent from '@layout/CookieConsent.astro'
 import Header from '@layout/Header.astro'
 import Footer from '@layout/Footer.astro'
+import FloatingPhoneWidget from '@components/global/FloatingPhoneWidget.astro'
 
 type Props = ComponentProps<typeof Head> & {
   hideHeader?: boolean
@@ -24,6 +25,7 @@ const { hideHeader, ...props } = Astro.props
   </head>
   <body>
     <CookieConsent />
+    <FloatingPhoneWidget />
     {!hideHeader && <Header />}
     <main id="main">
       <slot />
