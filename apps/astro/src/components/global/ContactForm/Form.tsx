@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'preact/hooks';
 import { useForm, type FieldValues, type SubmitHandler } from 'react-hook-form';
-import styles from './Form.module.scss';
 import Input from '@components/ui/Input'
 import Checkbox from '@components/ui/Checkbox'
 import Button from '@components/ui/Button'

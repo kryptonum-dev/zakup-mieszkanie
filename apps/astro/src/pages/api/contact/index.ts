@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
       body: JSON.stringify({
         from: 'Formularz kontaktowy Zakup Mieszkanie <formularz@sending.zakupmieszkanie.pl>',
-        to: 'admin@zakupmieszkanie.pl',
+        to: 'kontakt@zakupmieszkanie.pl',
         subject: '⭐️ Nowy kontakt z formularza kontaktowego',
         html: htmlTemplate,
         text: htmlToString(htmlTemplate),

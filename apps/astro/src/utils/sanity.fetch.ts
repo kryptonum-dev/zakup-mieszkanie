@@ -27,3 +27,4 @@ export default async function sanityFetch<QueryResponse>({
 }): Promise<QueryResponse> {
   return await client.fetch<QueryResponse>(query, params)
 }
+``
