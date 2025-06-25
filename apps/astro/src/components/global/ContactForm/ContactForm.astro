@@ -190,9 +190,19 @@ const Label = index === 0 ? 'h2' : 'h3'
       }
     }
     :global(form) {
+      display: grid;
+      gap: 1rem;
       position: relative;
       max-width: 28rem;
       margin: 0 auto;
+      :global(.column) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        & > * {
+          flex-grow: 1;
+        }
+      }
       .Loader,
       .ErrorState,
       .SuccessState {
