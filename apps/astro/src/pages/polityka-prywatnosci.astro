@@ -31,7 +31,7 @@ const metadata = await metadataFetch('/polityka-prywatnosci')
 ---
 
 <Layout {...metadata} hideHeader>
-  <Breadcrumbs data={[{ name: data.name, path: data.slug }]} />
+  <Breadcrumbs data={[{ name: data.name, path: data.slug }]} isHidden={true} />
   <section class="header">
     <PortableText value={data.header.heading} heading="h1" class="heading h2" />
     <PortableText value={data.header.paragraph} />

@@ -5,9 +5,12 @@ import { DOMAIN } from '@global/constants'
 <footer class="Footer" data-layout-footer>
   <div class="max-width">
     <div class="column">
-      <p class="copyright">© {new Date().getFullYear()} {DOMAIN.replace('https://', '')}. Wszelkie prawa zastrzeżone.</p>
+      <p class="copyright">
+        © {new Date().getFullYear()}
+        {DOMAIN.replace('https://', '')}. Wszelkie prawa zastrzeżone.
+      </p>
       <div class="legal">
-        <a href="/polityka-prywatnosci" class="link">Polityka prywatności</a>
+        <a href="/polityka-prywatnosci" class="link" target="_blank" rel="noopener">Polityka prywatności</a>
         <button class="link" id="reset-cookie-consent">Ustawienia plików cookies</button>
       </div>
     </div>
