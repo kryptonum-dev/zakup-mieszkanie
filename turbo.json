@@ -1,7 +1,16 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["SANITY_API_TOKEN", "SANITY_PROJECT_ID", "RESEND_API_KEY"],
+  "globalEnv": [
+    "SANITY_API_TOKEN",
+    "SANITY_PROJECT_ID",
+    "RESEND_API_KEY",
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+    "GOOGLE_PRIVATE_KEY",
+    "GOOGLE_SHEET_ID",
+    "GOOGLE_SHEET_NAME",
+    "SLACK_WEBHOOK_URL"
+  ],
   "tasks": {
     "build": { "dependsOn": ["^build"], "outputs": ["dist/**", ".vercel/**"] },
     "lint": { "dependsOn": ["^lint"] },
