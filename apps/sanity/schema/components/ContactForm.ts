@@ -31,6 +31,28 @@ export default defineField({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'badge',
+      type: 'object',
+      title: 'Badge',
+      fields: [
+        defineField({
+          name: 'icon',
+          type: 'image',
+          title: 'Icon',
+          options: {
+            accept: 'image/svg+xml',
+          },
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'text',
+          type: 'string',
+          title: 'Text',
+          validation: (Rule) => Rule.required(),
+        }),
+      ],
+    }),
+    defineField({
       name: 'formStates',
       type: 'object',
       title: 'Form States',
