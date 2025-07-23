@@ -78,7 +78,7 @@ export default function Form({ children, ...props }: Props) {
           politykę prywatności
         </a>
       </Checkbox>
-      <Button type="submit">Wyślij wiadomość</Button>
+      <Button type="submit">Proszę o telefon</Button>
       {children}
     </form>
   )
