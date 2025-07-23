@@ -11,7 +11,7 @@ const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ||
 const GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || import.meta.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
 
 export const POST: APIRoute = async ({ request }) => {
-  const { name, phone, legal } = (await request.json()) as Props;
+  const { name, phone, legal, landingPageName } = (await request.json()) as Props & { landingPageName: string };
 
   if (!REGEX.phone.test(phone) || !legal || !name) {
     return new Response(JSON.stringify({ message: 'Missing required fields', success: false }), { status: 400 });
@@ -19,7 +19,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const submissionDate = new Date().toLocaleString('pl-PL', { timeZone: 'Europe/Warsaw' });
   const defaultStatus = 'Nowy';
-  const newRow = [[submissionDate, name, `'${phone}`, defaultStatus]];
+  const newRow = [[landingPageName || 'Brak nazwy', submissionDate, name, `'${phone}`, defaultStatus]];
 
   const appendToSheet = async () => {
     try {
@@ -35,7 +35,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       await sheets.spreadsheets.values.append({
         spreadsheetId: GOOGLE_SHEET_ID,
-        range: `Sheet1!A:D`,
+        range: `Sheet1!A:E`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: newRow,
@@ -51,7 +51,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!SLACK_WEBHOOK_URL) return;
     try {
       const slackMessage = {
-        text: `🧲 *Nowy lead!* \n\nImię: ${name}\nTelefon: ${phone}`,
+        text: `🧲 *Nowy lead!* \n\nLanding Page: ${landingPageName || 'Brak nazwy'}\nImię: ${name}\nTelefon: ${phone}`,
       };
       await fetch(SLACK_WEBHOOK_URL, {
         method: 'POST',
@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const sendContactEmail = async () => {
     try {
-      const htmlTemplate = `<p>Imię: <b>${name}</b></p><p>Numer telefonu: <b>${phone}</b></p>`;
+      const htmlTemplate = `<p><b>Landing Page:</b> ${landingPageName || 'Brak nazwy'}</p><p>Imię: <b>${name}</b></p><p>Numer telefonu: <b>${phone}</b></p>`;
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -76,7 +76,7 @@ export const POST: APIRoute = async ({ request }) => {
         body: JSON.stringify({
           from: 'Formularz Zakup Mieszkanie <formularz@sending.zakupmieszkanie.pl>',
           to: 'kontakt@zakupmieszkanie.pl',
-          subject: '⭐️ Nowy lead Zakup Mieszkanie',
+          subject: `⭐️ Nowy lead z ${landingPageName || 'Zakup Mieszkanie'}`,
           html: htmlTemplate,
           text: htmlToString(htmlTemplate),
         }),

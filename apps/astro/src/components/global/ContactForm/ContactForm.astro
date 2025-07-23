@@ -26,6 +26,7 @@ type Props = {
       paragraph: PortableTextValue
     }
   }
+  landingPageName: string
 }
 
 export const ContactForm_Query = `
@@ -48,11 +49,12 @@ export const ContactForm_Query = `
         ${PortableTextQuery('heading')}
         ${PortableTextQuery('paragraph')}
       }
-    }
+    },
+    "landingPageName": coalesce(*[_type == "page" && slug.current == $slug][0].name, 'Zakup Mieszkanie')
   },
 `
 
-const { index, sectionId, label, heading, paragraph, badge, formStates, email, tel } = Astro.props
+const { index, sectionId, label, heading, paragraph, badge, formStates, email, tel, landingPageName } = Astro.props
 
 const Label = index === 0 ? 'h2' : 'h3'
 ---
@@ -106,7 +108,7 @@ const Label = index === 0 ? 'h2' : 'h3'
         }
       </div>
     </div>
-    <Form client:load>
+    <Form client:load landingPageName={landingPageName}>
       <Loader class="Loader" />
       <div class="SuccessState">
         <svg xmlns="http://www.w3.org/2000/svg" width={40} height={40} viewBox="0 0 40 40" fill="none">

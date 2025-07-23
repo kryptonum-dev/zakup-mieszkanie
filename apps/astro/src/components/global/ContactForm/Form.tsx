@@ -9,9 +9,10 @@ import { trackEvent } from '@api/analytics/track-event';
 
 type Props = {
   children: React.ReactNode,
+  landingPageName: string,
 } & React.FormHTMLAttributes<HTMLFormElement>
 
-export default function Form({ children, ...props }: Props) {
+export default function Form({ children, landingPageName, ...props }: Props) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const {
     register,
@@ -28,7 +29,7 @@ export default function Form({ children, ...props }: Props) {
 
   const onSubmit = async (data: sendContactEmailProps) => {
     setStatus('loading');
-    const response = await sendContactEmail(data as sendContactEmailProps);
+    const response = await sendContactEmail({ ...data, landingPageName } as sendContactEmailProps);
     if (response.success) {
       setStatus('success');
       reset();
