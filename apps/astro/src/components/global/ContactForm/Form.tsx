@@ -33,7 +33,6 @@ export default function Form({ children, landingPageName, ...props }: Props) {
     if (response.success) {
       setStatus('success');
       reset();
-      return;
       trackEvent({
         user_data: {
           email: data.email,
