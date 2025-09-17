@@ -33,8 +33,10 @@ export default function Form({ children, landingPageName, ...props }: Props) {
     if (response.success) {
       setStatus('success');
       reset();
+      return;
       trackEvent({
         user_data: {
+          email: data.email,
           phone: data.phone,
         },
         meta: {
@@ -59,6 +61,18 @@ export default function Form({ children, landingPageName, ...props }: Props) {
         })}
         errors={errors}
         type='text'
+        autoComplete='name'
+      />
+      <Input
+        label='Adres email'
+        register={register('email', {
+          required: { value: true, message: 'Email jest wymagany' },
+          pattern: { value: REGEX.email, message: 'Niepoprawny adres email' },
+        })}
+        errors={errors}
+        placeholder='twoj@email.pl'
+        autoComplete='email'
+        type='email'
       />
       <Input
         label='Numer telefonu'
@@ -67,6 +81,8 @@ export default function Form({ children, landingPageName, ...props }: Props) {
           pattern: { value: REGEX.phone, message: 'Niepoprawny numer telefonu' },
         })}
         errors={errors}
+        placeholder='+48 --- --- ---'
+        autoComplete='tel'
         type='tel'
       />
       <Checkbox

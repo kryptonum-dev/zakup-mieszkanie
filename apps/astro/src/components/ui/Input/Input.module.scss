@@ -24,7 +24,7 @@
       border-color: var(--primary-600, #341e0a);
     }
     &::placeholder {
-      color: var(--primary-600, #341e0a);
+      color: rgba(39, 22, 7, 0.5);
     }
     &[aria-invalid='true'] {
       border-color: var(--error-400, #c8452e);
