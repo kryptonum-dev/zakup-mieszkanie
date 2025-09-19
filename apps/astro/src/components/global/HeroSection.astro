@@ -38,7 +38,7 @@ const { index, sectionId, image, heading, paragraph, cta } = Astro.props
 <style lang="scss">
   .HeroSection {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 0.75fr 1fr;
     gap: 3rem;
     header {
       padding: clamp(4rem, calc(6vw / 0.48), 13rem) 0;
@@ -55,8 +55,8 @@ const { index, sectionId, image, heading, paragraph, cta } = Astro.props
       img {
         position: absolute;
         left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        top: 0;
+        transform: translate(-50%, 0);
       }
     }
     @media (max-width: 60rem) {
