@@ -1,0 +1,441 @@
+---
+import sanityFetch from '@utils/sanity.fetch'
+
+export interface Props {
+  delayMs?: number
+  fallbackDelayMs?: number
+}
+
+const { delayMs = 20000, fallbackDelayMs = 30000 } = Astro.props
+
+const data = await sanityFetch<{
+  videoTeasers?: { asset?: { url?: string } | null }[]
+}>({
+  query: `*[_type == "global"][0].phoneWidget {
+    videoTeasers[]{
+      asset -> { url }
+    }
+  }`,
+})
+
+const videoUrls = data?.videoTeasers?.map((item) => item?.asset?.url).filter((url): url is string => Boolean(url)) ?? []
+
+if (!videoUrls.length) return null
+---
+
+<div
+  class="video-teaser"
+  data-urls={JSON.stringify(videoUrls)}
+  data-delay={String(delayMs)}
+  data-fallback-delay={String(fallbackDelayMs)}
+>
+  <div class="video-teaser__overlay" aria-hidden="true" hidden></div>
+  <div class="video-teaser__card" role="dialog" aria-label="Wideo przedstawiające ofertę" hidden>
+    <button class="video-teaser__close" type="button" aria-label="Zamknij">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6l12 12" stroke="#fff" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+    </button>
+    <video class="video-teaser__video" playsinline autoplay preload="none"></video>
+    <button class="video-teaser__unmute" type="button" aria-label="Włącz dźwięk" hidden>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        stroke="currentColor"
+        width="24"
+        height="24"
+        stroke-width="1.5"
+        viewBox="0 0 24 24"
+        ><path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9 9 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25z"
+        ></path>
+      </svg>
+    </button>
+    <div class="video-teaser__progress">
+      <div class="video-teaser__progress-bar"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { animate } from 'motion'
+  ;(function () {
+    const root = document.querySelector<HTMLDivElement>('.video-teaser')
+    if (!root) return
+
+    const ds = root.dataset
+    const urls = JSON.parse(ds.urls || '[]').filter(Boolean)
+    if (!urls.length) return
+
+    const delayMs = Number(ds.delay || '20000')
+    const fallbackDelayMs = Number(ds.fallbackDelay || '30000')
+    const overlay = root.querySelector<HTMLDivElement>('.video-teaser__overlay')
+    const card = root.querySelector<HTMLDivElement>('.video-teaser__card')
+    const video = root.querySelector<HTMLVideoElement>('.video-teaser__video')
+    const closeBtn = root.querySelector<HTMLButtonElement>('.video-teaser__close')
+    const unmuteBtn = root.querySelector<HTMLButtonElement>('.video-teaser__unmute')
+    const progressBar = root.querySelector<HTMLDivElement>('.video-teaser__progress-bar')
+    const progressContainer = root.querySelector<HTMLDivElement>('.video-teaser__progress')
+
+    if (!overlay || !card || !video || !closeBtn || !unmuteBtn || !progressBar || !progressContainer) return
+
+    const remToPx = (rem: number) => rem * parseFloat(getComputedStyle(document.documentElement).fontSize || '16')
+    const pickUrl = () => urls[Math.floor(Math.random() * urls.length)]
+
+    let userHasInteracted = false
+    let isOpen = false
+    let clickTimer: number | null = null
+    let fallbackTimer: number | null = null
+
+    const openTeaser = async (fromUserInteraction = false) => {
+      if (!root.isConnected) return
+      if (isOpen) return
+      isOpen = true
+      if (clickTimer) {
+        window.clearTimeout(clickTimer)
+        clickTimer = null
+      }
+      if (fallbackTimer) {
+        window.clearTimeout(fallbackTimer)
+        fallbackTimer = null
+      }
+      if (fromUserInteraction) {
+        userHasInteracted = true
+      }
+
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      const maxW = Math.min(window.innerWidth - remToPx(2), remToPx(17.5))
+      const maxH = window.innerHeight - remToPx(2)
+      let targetW = Math.max(0, maxW)
+      let targetH = Math.round(targetW * (16 / 9))
+      if (targetH > maxH) {
+        targetH = Math.max(0, maxH)
+        targetW = Math.round(targetH * (9 / 16))
+      }
+
+      // Calculate perfect circle radius (half of the smaller dimension)
+      const circleRadius = remToPx(3.5) / 2 // 1.75rem = perfect circle for 3.5rem square
+
+      overlay.hidden = false
+      card.hidden = false
+      video.src = pickUrl()
+
+      // Update progress bar during playback with requestAnimationFrame for smoothness
+      let animationId: number
+      const updateProgress = () => {
+        if (video.duration > 0 && !video.paused) {
+          const progress = video.currentTime / video.duration
+          progressBar.style.transform = `scaleX(${progress})`
+          animationId = requestAnimationFrame(updateProgress)
+        }
+      }
+
+      video.addEventListener('play', () => {
+        updateProgress()
+      })
+
+      video.addEventListener('pause', () => {
+        if (animationId) cancelAnimationFrame(animationId)
+      })
+
+      const close = async () => {
+        if (animationId) cancelAnimationFrame(animationId)
+        // Hide buttons and progress bar immediately when closing starts
+        closeBtn.hidden = true
+        unmuteBtn.hidden = true
+        progressContainer.hidden = true
+        window.removeEventListener('keydown', onKey)
+        overlay.removeEventListener('click', close)
+        closeBtn.removeEventListener('click', close)
+        video.removeEventListener('ended', close)
+        video.pause()
+        video.currentTime = 0
+        isOpen = false
+
+        if (prefersReduced) {
+          overlay.hidden = true
+          card.hidden = true
+          // Remove from DOM after video ends
+          setTimeout(() => root.remove(), 100)
+          return
+        }
+
+        await animate(
+          card,
+          {
+            width: [`${targetW}px`, '3.5rem'],
+            height: [`${targetH}px`, '3.5rem'],
+            borderRadius: ['1rem', `${circleRadius}px`],
+            opacity: [1, 0.6],
+            scale: [1, 0.95],
+          },
+          { duration: 0.4, ease: [0.4, 0, 1, 1] }
+        ).finished.catch(() => {})
+
+        overlay.hidden = true
+        card.hidden = true
+        progressBar.style.transform = 'scaleX(0)'
+
+        // Remove from DOM after animation completes
+        setTimeout(() => root.remove(), 100)
+      }
+
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') close()
+      }
+
+      window.addEventListener('keydown', onKey)
+      overlay.addEventListener('click', close)
+      closeBtn.addEventListener('click', close)
+      video.addEventListener('ended', close)
+
+      if (prefersReduced) {
+        card.style.width = `${targetW}px`
+        card.style.height = `${targetH}px`
+        card.style.borderRadius = '1rem'
+
+        // Try to play with audio if user interacted, otherwise muted
+        if (fromUserInteraction) {
+          try {
+            video.muted = false
+            await video.play()
+            unmuteBtn.hidden = true
+          } catch {
+            try {
+              video.muted = true
+              await video.play()
+              unmuteBtn.hidden = false
+            } catch {
+              console.warn('[VideoTeaser] Autoplay blocked entirely')
+            }
+          }
+        } else {
+          try {
+            video.muted = true
+            await video.play()
+            unmuteBtn.hidden = false
+          } catch {
+            console.warn('[VideoTeaser] Autoplay blocked entirely')
+          }
+        }
+        return
+      }
+
+      await animate(
+        card,
+        {
+          width: ['3.5rem', `${targetW}px`],
+          height: ['3.5rem', `${targetH}px`],
+          borderRadius: [`${circleRadius}px`, '1rem'],
+          filter: ['blur(1px)', 'blur(0px)'],
+        },
+        { duration: 0.55, ease: [0.32, 0.72, 0, 1] }
+      ).finished.catch(() => {})
+
+      // Try to play with audio if user interacted, otherwise muted
+      if (fromUserInteraction) {
+        try {
+          video.muted = false
+          await video.play()
+          unmuteBtn.hidden = true
+        } catch {
+          try {
+            video.muted = true
+            await video.play()
+            unmuteBtn.hidden = false
+          } catch {
+            console.warn('[VideoTeaser] Autoplay blocked entirely')
+          }
+        }
+      } else {
+        try {
+          video.muted = true
+          await video.play()
+          unmuteBtn.hidden = false
+        } catch {
+          console.warn('[VideoTeaser] Autoplay blocked entirely')
+        }
+      }
+
+      // Handle unmute button click
+      unmuteBtn.addEventListener('click', async () => {
+        try {
+          // Pause first to ensure clean state
+          video.pause()
+          // Cancel any ongoing progress animation
+          if (animationId) cancelAnimationFrame(animationId)
+          // Unmute and restart
+          video.muted = false
+          video.currentTime = 0
+          progressBar.style.transform = 'scaleX(0)'
+          unmuteBtn.hidden = true
+          // Play the video
+          await video.play()
+        } catch (error) {
+          console.warn('[VideoTeaser] Play failed after unmute:', error)
+        }
+      })
+    }
+
+    const handleUserClick = () => {
+      if (isOpen) return
+      if (userHasInteracted) return
+      userHasInteracted = true
+
+      // Clear fallback timer since user interacted
+      if (fallbackTimer) {
+        window.clearTimeout(fallbackTimer)
+        fallbackTimer = null
+      }
+
+      // Set timer to show video after delay
+      clickTimer = window.setTimeout(() => openTeaser(true), delayMs)
+    }
+
+    // Listen for any click on the page
+    document.addEventListener('click', handleUserClick, { once: false })
+
+    // Fallback timer - show muted video if no interaction
+    fallbackTimer = window.setTimeout(() => {
+      if (!userHasInteracted && !isOpen) {
+        openTeaser(false)
+      }
+    }, fallbackDelayMs)
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      document.removeEventListener('click', handleUserClick)
+      if (clickTimer) window.clearTimeout(clickTimer)
+      if (fallbackTimer) window.clearTimeout(fallbackTimer)
+    })
+  })()
+</script>
+
+<style lang="scss">
+  .video-teaser {
+    display: contents;
+  }
+
+  .video-teaser__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.21);
+    z-index: 1000;
+  }
+
+  .video-teaser__overlay[hidden] {
+    display: none;
+  }
+
+  .video-teaser__card {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    z-index: 1001;
+    touch-action: manipulation;
+    display: grid;
+    place-items: stretch;
+  }
+
+  .video-teaser__card[hidden] {
+    display: none;
+  }
+
+  .video-teaser__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-teaser__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 150ms ease;
+  }
+
+  .video-teaser__close:hover {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  .video-teaser__close:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.85);
+    outline-offset: 2px;
+  }
+
+  .video-teaser__close svg {
+    display: block;
+  }
+
+  .video-teaser__unmute {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 150ms ease;
+  }
+
+  .video-teaser__unmute:hover {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  .video-teaser__unmute:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.85);
+    outline-offset: 2px;
+  }
+
+  .video-teaser__unmute[hidden] {
+    display: none;
+  }
+
+  .video-teaser__unmute svg {
+    display: block;
+  }
+
+  .video-teaser__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+  }
+
+  .video-teaser__progress-bar {
+    height: 100%;
+    width: 100%;
+    background: var(--primary-100, #f2ede8);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+</style>

@@ -8,6 +8,7 @@ import CookieConsent from '@layout/CookieConsent.astro'
 import Header from '@layout/Header.astro'
 import Footer from '@layout/Footer.astro'
 import FloatingPhoneWidget from '@components/global/FloatingPhoneWidget.astro'
+import VideoTeaser from '@components/global/VideoTeaser.astro'
 
 type Props = ComponentProps<typeof Head> & {
   hideHeader?: boolean
@@ -26,6 +27,7 @@ const { hideHeader, ...props } = Astro.props
   <body>
     <CookieConsent />
     <FloatingPhoneWidget />
+    <VideoTeaser delayMs={1000} fallbackDelayMs={20000} />
     {!hideHeader && <Header />}
     <main id="main">
       <slot />

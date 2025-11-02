@@ -49,6 +49,13 @@ export default defineType({
           description: 'Small circular image for the widget',
           validation: (Rule) => Rule.required(),
         }),
+        defineField({
+          name: 'videoTeasers',
+          type: 'array',
+          title: 'Video teasers',
+          description: 'Short vertical video(s) used for the expanding teaser. Upload as File (format: .webm or .mp4).',
+          of: [{ type: 'file', options: { accept: '.webm, .mp4' } }],
+        }),
       ],
     }),
     defineField({
