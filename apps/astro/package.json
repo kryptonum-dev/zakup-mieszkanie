@@ -37,6 +37,7 @@
   },
   "overrides": {
     "react": "bun:@preact/compat@latest",
-    "react-dom": "bun:@preact/compat@latest"
+    "react-dom": "bun:@preact/compat@latest",
+    "lru-cache": "^10.4.3"
   }
 }
