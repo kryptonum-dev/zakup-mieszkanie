@@ -9,6 +9,56 @@ const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL || import.meta.env.SLACK
 const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID || import.meta.env.GOOGLE_SHEET_ID;
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = (process.env.GOOGLE_PRIVATE_KEY || import.meta.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
+const SMS_API_TOKEN = process.env.SMS_API_TOKEN || import.meta.env.SMS_API_TOKEN;
+
+const normalizePhoneForSmsApi = (phone: string) => phone.replace(/\D/g, '');
+
+const sendClientSms = async ({ phone }: { phone: string }) => {
+  if (!SMS_API_TOKEN) return;
+
+  // SMS content must be short & consistent (user requested exact copy)
+  const message =
+    'Czesc! Tu Krzysztof Iwan (Zakup Mieszkanie). Dostalem Twoje zgloszenie. Zadzwonie niebawem z numeru 791 763 339, aby porozmawiac o konkretach. Do uslyszenia!';
+
+  try {
+    const to = normalizePhoneForSmsApi(phone);
+    const body = new URLSearchParams({
+      to,
+      message,
+      // no `from` => SMSAPI uses the account's default sender field (configured in dashboard)
+      format: 'json',
+    });
+
+    const response = await fetch('https://api.smsapi.pl/sms.do', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${SMS_API_TOKEN}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body,
+    });
+
+    const text = await response.text();
+    if (!response.ok) {
+      console.error('SMSAPI error response:', { status: response.status, text });
+      return;
+    }
+
+    // SMSAPI may respond with JSON when format=json, but keep it robust.
+    try {
+      const json = JSON.parse(text) as Record<string, unknown>;
+      if (typeof json?.error === 'number' || typeof json?.error === 'string') {
+        console.error('SMSAPI error response:', json);
+        return;
+      }
+      console.log('SMSAPI success response:', json);
+    } catch {
+      console.log('SMSAPI response:', text);
+    }
+  } catch (error) {
+    console.error('Error sending SMS via SMSAPI:', error);
+  }
+};
 
 export const POST: APIRoute = async ({ request }) => {
   const { name, email, phone, legal, landingPageName } = (await request.json()) as Props & { landingPageName: string };
@@ -96,6 +146,7 @@ export const POST: APIRoute = async ({ request }) => {
       appendToSheet(),
       sendSlackNotification(),
       sendContactEmail(),
+      sendClientSms({ phone }),
     ]);
 
     return new Response(JSON.stringify({ message: 'Successfully processed lead', success: true }), { status: 200 });
