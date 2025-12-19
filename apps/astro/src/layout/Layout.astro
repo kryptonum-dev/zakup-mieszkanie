@@ -27,7 +27,7 @@ const { hideHeader, ...props } = Astro.props
   <body>
     <CookieConsent />
     <FloatingPhoneWidget />
-    <VideoTeaser delayMs={1000} fallbackDelayMs={20000} />
+    <VideoTeaser delayMs={5000} fallbackDelayMs={30000} minTimeBeforeClickMs={15000} />
     {!hideHeader && <Header />}
     <main id="main">
       <slot />
