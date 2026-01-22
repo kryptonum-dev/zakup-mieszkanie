@@ -4,10 +4,9 @@ import sanityFetch from '@utils/sanity.fetch'
 export interface Props {
   delayMs?: number
   fallbackDelayMs?: number
-  minTimeBeforeClickMs?: number
 }
 
-const { delayMs = 20000, fallbackDelayMs = 30000, minTimeBeforeClickMs = 15000 } = Astro.props
+const { delayMs = 20000, fallbackDelayMs = 30000 } = Astro.props
 
 const data = await sanityFetch<{
   videoTeasers?: { asset?: { url?: string } | null }[]
@@ -29,7 +28,6 @@ if (!videoUrls.length) return null
   data-urls={JSON.stringify(videoUrls)}
   data-delay={String(delayMs)}
   data-fallback-delay={String(fallbackDelayMs)}
-  data-min-time={String(minTimeBeforeClickMs)}
 >
   <div class="video-teaser__overlay" aria-hidden="true" hidden></div>
   <div class="video-teaser__card" role="dialog" aria-label="Wideo przedstawiające ofertę" hidden>
@@ -73,8 +71,6 @@ if (!videoUrls.length) return null
 
     const delayMs = Number(ds.delay || '20000')
     const fallbackDelayMs = Number(ds.fallbackDelay || '30000')
-    const minTimeBeforeClickMs = Number(ds.minTime || '15000')
-    const pageLoadTime = Date.now()
     const overlay = root.querySelector<HTMLDivElement>('.video-teaser__overlay')
     const card = root.querySelector<HTMLDivElement>('.video-teaser__card')
     const video = root.querySelector<HTMLVideoElement>('.video-teaser__video')
@@ -287,12 +283,6 @@ if (!videoUrls.length) return null
     const handleUserClick = () => {
       if (isOpen) return
       if (userHasInteracted) return
-
-      // Ignore clicks until user has been on page for minimum time
-      // This prevents triggering on cookie banner clicks from ad visitors
-      const timeOnPage = Date.now() - pageLoadTime
-      if (timeOnPage < minTimeBeforeClickMs) return
-
       userHasInteracted = true
 
       // Clear fallback timer since user interacted

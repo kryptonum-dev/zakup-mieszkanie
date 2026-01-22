@@ -12,10 +12,12 @@ const page = await sanityFetch<{
   name: string
   slug: string
   components: ComponentsProps
+  disableVideoTeaser?: boolean
 }>({
   query: `*[_type == "page" && slug.current == $slug][0] {
     name,
     "slug": slug.current,
+    "disableVideoTeaser": coalesce(localSettings.disableVideoTeaser, false),
     ${Components_Query}
   }`,
   params: { slug: slug },
@@ -26,7 +28,7 @@ if (!page) return Astro.rewrite('/404')
 const metadata = await metadataFetch(slug)
 ---
 
-<Layout {...metadata}>
+<Layout {...metadata} disableVideoTeaser={page.disableVideoTeaser}>
   <Breadcrumbs data={[{ name: page.name, path: page.slug }]} isHidden={true} />
   <Components data={page.components} />
 </Layout>

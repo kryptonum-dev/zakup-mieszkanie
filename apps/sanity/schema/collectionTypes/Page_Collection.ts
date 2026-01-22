@@ -19,6 +19,20 @@ export default defineType({
       options: { collapsible: true },
       fields: [
         defineField({
+          name: 'noindex',
+          type: 'boolean',
+          title: 'Noindex',
+          description: 'If enabled, search engines will not index this page. Useful for private landing pages.',
+          initialValue: false,
+        }),
+        defineField({
+          name: 'disableVideoTeaser',
+          type: 'boolean',
+          title: 'Disable Video Teaser',
+          description: 'If enabled, the floating video teaser popup will not appear on this page.',
+          initialValue: false,
+        }),
+        defineField({
           name: 'email',
           type: 'string',
           title: 'Email',

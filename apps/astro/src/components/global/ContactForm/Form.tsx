@@ -10,9 +10,10 @@ import { trackEvent } from '@api/analytics/track-event';
 type Props = {
   children: React.ReactNode,
   landingPageName: string,
+  showMessage?: boolean,
 } & React.FormHTMLAttributes<HTMLFormElement>
 
-export default function Form({ children, landingPageName, ...props }: Props) {
+export default function Form({ children, landingPageName, showMessage, ...props }: Props) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const {
     register,
@@ -84,6 +85,15 @@ export default function Form({ children, landingPageName, ...props }: Props) {
         autoComplete='tel'
         type='tel'
       />
+      {showMessage && (
+        <Input
+          label='Wiadomość (opcjonalnie)'
+          register={register('message')}
+          errors={errors}
+          isTextarea
+          placeholder='Wpisz swoją wiadomość...'
+        />
+      )}
       <Checkbox
         register={register('legal', {
           required: { value: true, message: 'Zgoda jest wymagana' },

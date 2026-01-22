@@ -7,6 +7,8 @@ import ContactImage, { ContactImage_Query } from '@components/global/ContactImag
 import Faq, { Faq_Query } from '@components/global/Faq.astro'
 import ContactForm, { ContactForm_Query } from '@components/global/ContactForm/ContactForm.astro'
 import SimpleColumn, { SimpleColumn_Query } from '@components/global/SimpleColumn.astro'
+import VideoPlayer, { VideoPlayer_Query } from '@components/global/VideoPlayer.astro'
+import ActionBar, { ActionBar_Query } from '@components/global/ActionBar.astro'
 
 const components = {
   HeroSection,
@@ -16,6 +18,8 @@ const components = {
   ContactImage,
   Faq,
   ContactForm,
+  VideoPlayer,
+  ActionBar,
 }
 
 type ComponentsMap = {
@@ -44,6 +48,8 @@ export const Components_Query = /* groq */ `
     ${ContactImage_Query}
     ${Faq_Query}
     ${ContactForm_Query}
+    ${VideoPlayer_Query}
+    ${ActionBar_Query}
   }
 `
 ---

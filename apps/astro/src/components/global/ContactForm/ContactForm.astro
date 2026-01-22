@@ -7,6 +7,7 @@ import Form from './Form'
 type Props = {
   index: number
   sectionId?: string
+  showMessage?: boolean
   label: string
   heading: PortableTextValue
   paragraph: PortableTextValue
@@ -31,6 +32,7 @@ type Props = {
 
 export const ContactForm_Query = `
   _type == "ContactForm" => {
+    showMessage,
     label,
     "email": coalesce(*[_type == "page" && slug.current == $slug][0].localSettings.email, *[_type == "global"][0].email),
     "tel": coalesce(*[_type == "page" && slug.current == $slug][0].localSettings.tel, *[_type == "global"][0].tel),
@@ -54,7 +56,7 @@ export const ContactForm_Query = `
   },
 `
 
-const { index, sectionId, label, heading, paragraph, badge, formStates, email, tel, landingPageName } = Astro.props
+const { index, sectionId, showMessage, label, heading, paragraph, badge, formStates, email, tel, landingPageName } = Astro.props
 
 const Label = index === 0 ? 'h2' : 'h3'
 ---
@@ -108,7 +110,7 @@ const Label = index === 0 ? 'h2' : 'h3'
         }
       </div>
     </div>
-    <Form client:load landingPageName={landingPageName}>
+    <Form client:load landingPageName={landingPageName} showMessage={showMessage}>
       <Loader class="Loader" />
       <div class="SuccessState">
         <svg xmlns="http://www.w3.org/2000/svg" width={40} height={40} viewBox="0 0 40 40" fill="none">

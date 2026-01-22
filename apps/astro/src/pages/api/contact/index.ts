@@ -61,7 +61,7 @@ const sendClientSms = async ({ phone }: { phone: string }) => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-  const { name, email, phone, legal, landingPageName } = (await request.json()) as Props & { landingPageName: string };
+  const { name, email, phone, message, legal, landingPageName } = (await request.json()) as Props & { landingPageName: string; message?: string };
 
   if (!REGEX.phone.test(phone) || !REGEX.email.test(email) || !legal || !name) {
     return new Response(JSON.stringify({ message: 'Missing required fields', success: false }), { status: 400 });
@@ -69,7 +69,9 @@ export const POST: APIRoute = async ({ request }) => {
 
   const submissionDate = new Date().toLocaleString('pl-PL', { timeZone: 'Europe/Warsaw' });
   const defaultStatus = 'Nowy';
-  const newRow = [[landingPageName || 'Brak nazwy', submissionDate, name, email, `'${phone}`, defaultStatus]];
+  const sanitizedMessage = message?.trim() || '';
+  // Columns: Landing Page | Data | Imię | Adres email | Numer Telefonu | Wiadomość | Status
+  const newRow = [[landingPageName || 'Brak nazwy', submissionDate, name, email, `'${phone}`, sanitizedMessage, defaultStatus]];
 
   const appendToSheet = async () => {
     try {
@@ -85,8 +87,9 @@ export const POST: APIRoute = async ({ request }) => {
 
       await sheets.spreadsheets.values.append({
         spreadsheetId: GOOGLE_SHEET_ID,
-        range: `Sheet1!A:F`,
+        range: `Sheet1!A1`,
         valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
         requestBody: {
           values: newRow,
         },
@@ -100,8 +103,9 @@ export const POST: APIRoute = async ({ request }) => {
   const sendSlackNotification = async () => {
     if (!SLACK_WEBHOOK_URL) return;
     try {
+      const messageText = sanitizedMessage ? `\nWiadomość: ${sanitizedMessage}` : '';
       const slackMessage = {
-        text: `🧲 *Nowy lead!* \n\nLanding Page: ${landingPageName || 'Brak nazwy'}\nImię: ${name}\nEmail: ${email}\nTelefon: ${phone}`,
+        text: `🧲 *Nowy lead!* \n\nLanding Page: ${landingPageName || 'Brak nazwy'}\nImię: ${name}\nEmail: ${email}\nTelefon: ${phone}${messageText}`,
       };
       await fetch(SLACK_WEBHOOK_URL, {
         method: 'POST',
@@ -116,7 +120,8 @@ export const POST: APIRoute = async ({ request }) => {
 
   const sendContactEmail = async () => {
     try {
-      const htmlTemplate = `<p><b>Landing Page:</b> ${landingPageName || 'Brak nazwy'}</p><p>Imię: <b>${name}</b></p><p>Email: <b>${email}</b></p><p>Numer telefonu: <b>${phone}</b></p>`;
+      const messageHtml = sanitizedMessage ? `<p>Wiadomość: <b>${sanitizedMessage}</b></p>` : '';
+      const htmlTemplate = `<p><b>Landing Page:</b> ${landingPageName || 'Brak nazwy'}</p><p>Imię: <b>${name}</b></p><p>Email: <b>${email}</b></p><p>Numer telefonu: <b>${phone}</b></p>${messageHtml}`;
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {

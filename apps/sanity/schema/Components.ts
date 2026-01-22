@@ -6,6 +6,8 @@ import Features from './components/Features'
 import HeroSection from './components/HeroSection'
 import Process from './components/Process'
 import SimpleColumn from './components/SimpleColumn'
+import VideoPlayer from './components/VideoPlayer'
+import ActionBar from './components/ActionBar'
 
 export default defineType({
   name: 'components',
@@ -19,7 +21,9 @@ export default defineType({
     Process,
     ContactImage,
     Faq,
-    ContactForm
+    ContactForm,
+    VideoPlayer,
+    ActionBar
   ],
   options: {
     insertMenu: {

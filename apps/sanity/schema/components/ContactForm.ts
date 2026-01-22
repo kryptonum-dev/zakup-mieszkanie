@@ -13,6 +13,13 @@ export default defineField({
   icon,
   fields: [
     defineField({
+      name: 'showMessage',
+      type: 'boolean',
+      title: 'Show Message Field',
+      description: 'If enabled, a message textarea will be shown in the form.',
+      initialValue: false,
+    }),
+    defineField({
       name: 'label',
       type: 'string',
       title: 'Label',

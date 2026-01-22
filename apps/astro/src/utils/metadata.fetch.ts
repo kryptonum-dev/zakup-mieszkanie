@@ -12,6 +12,7 @@ export default async function metadataFetch(slug: string): Promise<Props> {
         "title": seo.title,
         "description": seo.description,
         "openGraphImage": seo.img.asset -> url + "?w=1200",
+        "noindex": coalesce(localSettings.noindex, false),
       }
     `,
     params: { slug },

@@ -12,9 +12,10 @@ import VideoTeaser from '@components/global/VideoTeaser.astro'
 
 type Props = ComponentProps<typeof Head> & {
   hideHeader?: boolean
+  disableVideoTeaser?: boolean
 }
 
-const { hideHeader, ...props } = Astro.props
+const { hideHeader, disableVideoTeaser, ...props } = Astro.props
 ---
 
 <!doctype html>
@@ -27,7 +28,7 @@ const { hideHeader, ...props } = Astro.props
   <body>
     <CookieConsent />
     <FloatingPhoneWidget />
-    <VideoTeaser delayMs={5000} fallbackDelayMs={30000} minTimeBeforeClickMs={15000} />
+    {!disableVideoTeaser && <VideoTeaser delayMs={1000} fallbackDelayMs={20000} />}
     {!hideHeader && <Header />}
     <main id="main">
       <slot />

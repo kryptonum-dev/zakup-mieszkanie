@@ -1,0 +1,86 @@
+---
+import Button from '@components/ui/Button'
+
+export const ActionBar_Query = `
+  _type == "ActionBar" => {
+    phoneNumber,
+    displayPhoneNumber,
+    callButtonText,
+    smsButtonText,
+    contactLabel,
+  },
+`
+
+type Props = {
+  index: number
+  sectionId?: string
+  phoneNumber: string
+  displayPhoneNumber: string
+  callButtonText: string
+  smsButtonText: string
+  contactLabel: string
+}
+
+const { sectionId, phoneNumber, displayPhoneNumber, callButtonText, smsButtonText, contactLabel } = Astro.props
+---
+
+<section class="ActionBar" id={sectionId}>
+  <div class="buttons">
+    <Button href={`tel:${phoneNumber}`} theme="primary" className="btn">
+      {callButtonText}
+    </Button>
+    <Button href={`sms:${phoneNumber}`} theme="secondary" className="btn">
+      {smsButtonText}
+    </Button>
+  </div>
+  <p class="contact-info">
+    <span class="label">{contactLabel}</span>
+    <span class="phone">{displayPhoneNumber}</span>
+  </p>
+</section>
+
+<style lang="scss">
+  .ActionBar {
+    padding: clamp(1.5rem, calc(2vw / 0.48), 2.5rem) 0;
+    text-align: center;
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    :global(.btn) {
+      min-width: 12rem;
+      min-height: 3rem;
+      padding: 0.875rem 1.75rem;
+    }
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      .label {
+        font-size: 0.875rem;
+        color: var(--primary-500, #683c14);
+      }
+      .phone {
+        font-size: clamp(1.5rem, calc(2vw / 0.48), 2rem);
+        font-weight: 700;
+        font-family: 'Lora', 'Lora Fallback', serif;
+        color: var(--primary-700, #271607);
+        letter-spacing: 0.05em;
+      }
+    }
+    @media (max-width: 30rem) {
+      .buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      :global(.btn) {
+        min-width: auto;
+        width: 100%;
+      }
+    }
+  }
+</style>
